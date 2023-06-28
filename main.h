@@ -4,6 +4,8 @@
 #include "Trade.h"
 #include "OrderBook.h"
 #include "Stock.h"
+#include "Trader.h"
+#include "Market.h"
 
 #include <queue>
 #include <vector>

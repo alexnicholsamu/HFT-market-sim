@@ -6,14 +6,15 @@
 #include "Order.h"
 #include "Trade.h"
 
+
 class OrderBook {
 private:
     std::priority_queue<Order> buyOrders;
     std::priority_queue<Order> sellOrders;
 
 public: 
-    void addOrder(Order order, int id);
+    void addOrder(Order order);
     Order grabBuyOrder();
     Order grabSellOrder();
-    void executeTrades();
+    std::vector<Order> executeTrades();
 };

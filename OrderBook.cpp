@@ -2,24 +2,36 @@
 
 struct CompareSellOrder {
     bool operator()(Order& OrderA, Order& OrderB) {
-        return OrderA.stock.getPrice() > OrderB.stock.getPrice();
+        if (OrderA.stock.getPrice() != OrderB.stock.getPrice()) {
+            return OrderA.stock.getPrice() < OrderB.stock.getPrice();
+        }
+        else {
+            return OrderA.timestamp > OrderB.timestamp;
+        }
+    }
+};
+
+struct CompareOrder {
+    bool operator()(Order& OrderA, Order& OrderB) {
+        if (OrderA.stock.getPrice() != OrderB.stock.getPrice()) {
+            return OrderA.stock.getPrice() > OrderB.stock.getPrice();
+        }
+        else {
+            return OrderA.timestamp > OrderB.timestamp;
+        }
     }
 };
 
 class OrderBook {
 public:
-    std::priority_queue<Order> buyOrders;
+    std::priority_queue<Order, std::vector<Order>, CompareOrder> buyOrders;
     std::priority_queue<Order, std::vector<Order>, CompareSellOrder> sellOrders;
 
-    void addOrder(Order order, int id) {
+    void addOrder(Order order) {
         if(order.type == OrderType::Buy) {
-            order.status = OrderStatus::Open;
-            order.id = id;
             buyOrders.push(order);
         } 
         else{
-            order.status = OrderStatus::Open;
-            order.id = id;
             sellOrders.push(order);
         }
     }
@@ -42,18 +54,32 @@ public:
         return nextOrder;
     }
 
-    void executeTrades() {
+    std::vector<Order> executeTrades() {
         while(!buyOrders.empty() && !sellOrders.empty()) {
-            Order buyOrder = grabBuyOrder();
-            Order sellOrder = grabSellOrder();
+            Order buyOrder = buyOrders.top();
+            Order sellOrder = sellOrders.top();
 
-            if(buyOrder.stock.name == sellOrder.stock.name){
+            if(buyOrder.stock.name == sellOrder.stock.name && buyOrder.stock.getPrice() >= sellOrder.stock.getPrice()) {
                 Trade trade(buyOrder, sellOrder);
-                // trade logic that needs to reference portfolio
-            }
-            else{
-                // execute buy/sell in portfolio
+
+                buyOrder.quantity -= trade.tradeQuantity;
+                sellOrder.quantity -= trade.tradeQuantity;
+
+                if(buyOrder.quantity == 0) {
+                    buyOrders.pop();
+                }
+                if(sellOrder.quantity == 0) {
+                    sellOrders.pop();
+                }
+                std::vector<Order> orders;
+                orders.push_back(buyOrder);
+                orders.push_back(sellOrder);
+                return orders;
+            } 
+            else {
+                break;
             }
         }
     }
+
 };

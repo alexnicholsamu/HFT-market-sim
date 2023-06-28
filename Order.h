@@ -1,6 +1,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <chrono>
 
 #include "Stock.h"
 
@@ -14,6 +15,7 @@ public:
     int quantity;
     OrderStatus status = OrderStatus::Open;
     int id;
+    std::chrono::system_clock::time_point timestamp;
 public:
     Order(OrderType type, Stock stock, int quantity, int id);
 };

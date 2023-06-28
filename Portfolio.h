@@ -14,6 +14,6 @@ public:
     Portfolio();
     double portfolioValue();
     double totalFunds(double available_funds);
-    void makeChange(Order& order, double available_funds);
+    double makeChange(Order& order, double available_funds);
     std::vector<std::string> listCompanies();
 };

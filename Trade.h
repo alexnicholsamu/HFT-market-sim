@@ -10,5 +10,8 @@ class Trade{
 public:
     Order buyOrder;
     Order sellOrder;
+    std::chrono::system_clock::time_point timestamp;
+    int tradeQuantity;
+
     Trade(Order buyOrder, Order sellOrder);
 };

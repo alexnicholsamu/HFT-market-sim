@@ -20,7 +20,7 @@ public:
         return portfolioValue() + available_funds;
     }
 
-    void makeChange(Order& order, double available_funds){
+    double makeChange(Order& order, double available_funds){
         if(order.type == OrderType::Buy){
             Stock company = order.stock;
             int quantity = order.quantity;
@@ -53,6 +53,7 @@ public:
                 std::cout << "Sell order complete!";
             }
         }
+        return available_funds;
     }
 
     std::vector<std::string> listCompanies(){
