@@ -12,8 +12,8 @@ public:
     OrderType type;
     Stock stock;
     int quantity;
-    OrderStatus status;
-
+    OrderStatus status = OrderStatus::Open;
+    int id;
 public:
-    Order(OrderType type, Stock stock, int quantity, OrderStatus status);
+    Order(OrderType type, Stock stock, int quantity, int id);
 };

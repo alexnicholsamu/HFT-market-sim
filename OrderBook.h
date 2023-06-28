@@ -4,6 +4,7 @@
 #include <queue>
 
 #include "Order.h"
+#include "Trade.h"
 
 class OrderBook {
 private:
@@ -11,7 +12,8 @@ private:
     std::priority_queue<Order> sellOrders;
 
 public: 
-    void addOrder(Order order);
+    void addOrder(Order order, int id);
     Order grabBuyOrder();
     Order grabSellOrder();
+    void executeTrades();
 };

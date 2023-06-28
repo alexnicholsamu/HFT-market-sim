@@ -8,7 +8,7 @@ public:
     double factors = 1.0;
 
     // Constructor
-    MarketEvent(MarketEventType type, double impact, double interestRate, double factors): type(type), impact(impact), 
+    MarketEvent(MarketEventType type, double impact): type(type), impact(impact), 
         interestRate(interestRate), factors(factors) {}
 
     void applyImpact() {

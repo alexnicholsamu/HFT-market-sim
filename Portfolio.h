@@ -8,13 +8,12 @@
 
 class Portfolio {
 public:
-    double available_funds;
     std::map<Stock, int> holdings; 
 
 public:
-    Portfolio(double available_funds);
+    Portfolio();
     double portfolioValue();
-    double totalFunds();
-    void makeChange(Order& order);
+    double totalFunds(double available_funds);
+    void makeChange(Order& order, double available_funds);
     std::vector<std::string> listCompanies();
 };

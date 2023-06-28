@@ -3,9 +3,8 @@
 class Portfolio {
 public: 
     std::map<Stock, int> holdings;
-    double available_funds;
 
-    Portfolio(double available_funds): available_funds(available_funds) {}
+    Portfolio(): holdings(holdings) {}
 
     double portfolioValue(){
         double totvalue = 0;
@@ -17,17 +16,19 @@ public:
         return totvalue;
     }
 
-    double totalFunds(){
+    double totalFunds(double available_funds){
         return portfolioValue() + available_funds;
     }
 
-    void makeChange(Order& order){
+    void makeChange(Order& order, double available_funds){
         if(order.type == OrderType::Buy){
             Stock company = order.stock;
             int quantity = order.quantity;
             double moneychange = company.getPrice() * quantity;
             available_funds -= moneychange;
             holdings[company] += quantity;
+            order.status = OrderStatus::Closed;
+            std::cout << "Buy order complete!";
         }
         else{
             Stock company = order.stock;
@@ -48,6 +49,8 @@ public:
                 if(holdings[company]==0){
                     holdings.extract(holdings.find(company));
                 }
+                order.status = OrderStatus::Closed;
+                std::cout << "Sell order complete!";
             }
         }
     }

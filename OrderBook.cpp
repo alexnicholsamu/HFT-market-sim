@@ -11,11 +11,15 @@ public:
     std::priority_queue<Order> buyOrders;
     std::priority_queue<Order, std::vector<Order>, CompareSellOrder> sellOrders;
 
-    void addOrder(Order order) {
+    void addOrder(Order order, int id) {
         if(order.type == OrderType::Buy) {
+            order.status = OrderStatus::Open;
+            order.id = id;
             buyOrders.push(order);
         } 
         else{
+            order.status = OrderStatus::Open;
+            order.id = id;
             sellOrders.push(order);
         }
     }
@@ -36,5 +40,20 @@ public:
         Order nextOrder = sellOrders.top();
         sellOrders.pop();
         return nextOrder;
-}
+    }
+
+    void executeTrades() {
+        while(!buyOrders.empty() && !sellOrders.empty()) {
+            Order buyOrder = grabBuyOrder();
+            Order sellOrder = grabSellOrder();
+
+            if(buyOrder.stock.name == sellOrder.stock.name){
+                Trade trade(buyOrder, sellOrder);
+                // trade logic that needs to reference portfolio
+            }
+            else{
+                // execute buy/sell in portfolio
+            }
+        }
+    }
 };

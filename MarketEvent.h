@@ -11,7 +11,7 @@ public:
     double impact;
     double interestRate;
     double factors;
-    MarketEvent(MarketEventType type, double impact, double interestRate, double factors);
+    MarketEvent(MarketEventType type, double impact);
     void applyImpact();
     double marketFactor();
     double getFactor();

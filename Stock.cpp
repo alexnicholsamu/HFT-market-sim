@@ -6,7 +6,7 @@ public:
     double price;
     MarketEvent* marketEvent;
 
-    Stock(std::string name, double price, MarketEvent* marketEvent): name(name), price(price), marketEvent(marketEvent) {}
+    Stock(std::string name, double price): name(name), price(price), marketEvent(marketEvent) {}
 
     double getPrice(){
         return marketEvent->getFactor()*price;

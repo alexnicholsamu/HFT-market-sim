@@ -11,6 +11,6 @@ public:
     MarketEvent* marketEvent;
 
 public:
-    Stock(std::string name, double price, MarketEvent* marketEvent);
+    Stock(std::string name, double price);
     double getPrice();
 };
