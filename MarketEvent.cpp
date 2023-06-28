@@ -12,9 +12,6 @@ public:
         interestRate(interestRate), factors(factors) {}
 
     void applyImpact() {
-        // This is a placeholder implementation. You would want to
-        // implement this method based on how you want your market events
-        // to impact the order book.
         switch(type) {
             case MarketEventType::InterestRateChange:
                 double oldIR = interestRate;

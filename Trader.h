@@ -19,4 +19,8 @@ public:
 
     void makeOrder(OrderType type, Stock stock, int quantity, int id);
     void updatePortfolio(Order order);
+    void cancelOrder(Order order);
+    void getPositions();
+    void getPortfolioValue();
+    void getTotalValue();
 };

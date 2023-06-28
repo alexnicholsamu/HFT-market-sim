@@ -5,8 +5,9 @@ public:
     std::vector<Trader> traders;
     OrderBook* orderbook;
 
+    Market(): traders(traders), orderbook(orderbook) {}
 
-    void executeTrades(){
+    void executeOrderBook(){
         std::vector<Order> orders = orderbook->executeTrades();
         Order buyOrder = orders[0];
         Order sellOrder = orders[1];

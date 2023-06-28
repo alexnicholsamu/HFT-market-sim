@@ -22,36 +22,13 @@ public:
 
     double makeChange(Order& order, double available_funds){
         if(order.type == OrderType::Buy){
-            Stock company = order.stock;
-            int quantity = order.quantity;
-            double moneychange = company.getPrice() * quantity;
-            available_funds -= moneychange;
-            holdings[company] += quantity;
-            order.status = OrderStatus::Closed;
+            holdings[order.stock] += order.quantity;
             std::cout << "Buy order complete!";
         }
         else{
-            Stock company = order.stock;
-            int quantity = order.quantity;
-            // this if/else checks if the company is in the map, if it reaches the end then it is not in
-            if (holdings.find(company) == holdings.end()) { 
-                std::cout << "Error: Stock not in portfolio!\n";
-                return;
-            } 
-            else {
-                if(holdings[company] - quantity<0){
-                    std::cout << "Warning: Only have " << holdings[company] << " shares of " << company.name <<
-                    ". Instead, selling all available shares";
-                    quantity = holdings[company];
-                }
-                double moneychange = company.getPrice() * quantity;
-                holdings[company] -= quantity;
-                if(holdings[company]==0){
-                    holdings.extract(holdings.find(company));
-                }
-                order.status = OrderStatus::Closed;
-                std::cout << "Sell order complete!";
-            }
+            double moneychange = order.stock.getPrice() * order.quantity;
+            available_funds += moneychange;
+            std::cout << "Sell order complete!";
         }
         return available_funds;
     }

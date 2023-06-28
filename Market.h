@@ -8,7 +8,9 @@
 
 class Market{
 public:
-    std::vector<Trader>;
+    std::vector<Trader> traders;
+    OrderBook* orderbook;
+    Market(): traders(traders), orderbook(orderbook) {}
     // ill do orderbook stuff here
     // basically overarching class
 };

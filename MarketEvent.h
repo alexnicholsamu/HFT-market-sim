@@ -9,10 +9,10 @@ class MarketEvent{
 public: 
     MarketEventType type;
     double impact;
-    double interestRate;
-    double factors;
+    double interestRate = 1.0;
+    double factors = 1.0;
     MarketEvent(MarketEventType type, double impact);
     void applyImpact();
-    double marketFactor();
+    void marketFactor();
     double getFactor();
 };
