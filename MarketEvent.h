@@ -3,14 +3,16 @@
 #include <iostream>
 #include <map>
 
-#include "Stock.h"
-
 enum class MarketEventType { InterestRateChange, EarningsReport };
 
 class MarketEvent{
 public: 
     MarketEventType type;
     double impact;
-    MarketEvent(MarketEventType type, double impact);
+    double interestRate;
+    double factors;
+    MarketEvent(MarketEventType type, double impact, double interestRate, double factors);
     void applyImpact();
+    double marketFactor();
+    double getFactor();
 };

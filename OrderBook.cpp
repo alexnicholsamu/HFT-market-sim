@@ -1,9 +1,8 @@
 #include "OrderBook.h"
 
-// using operator(), which changes the structure of the prioirty queue to follow this manner instead
 struct CompareSellOrder {
     bool operator()(Order& OrderA, Order& OrderB) {
-        return OrderA.stock.getPrice()*OrderA.quantity > OrderB.stock.getPrice()*OrderB.quantity;
+        return OrderA.stock.getPrice() > OrderB.stock.getPrice();
     }
 };
 
@@ -21,16 +20,21 @@ public:
         }
     }
 
-    Order grabBuyOrder(){
+    Order grabBuyOrder() {
+        if(buyOrders.empty()) {
+            throw std::out_of_range("No more buy orders");
+        }
         Order nextOrder = buyOrders.top();
         buyOrders.pop();
         return nextOrder;
     }
 
-    Order grabSellOrder(){
+    Order grabSellOrder() {
+        if(sellOrders.empty()) {
+            throw std::out_of_range("No more sell orders");
+        }
         Order nextOrder = sellOrders.top();
         sellOrders.pop();
         return nextOrder;
-    }
-
+}
 };

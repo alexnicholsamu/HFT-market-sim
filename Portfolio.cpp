@@ -12,7 +12,7 @@ public:
         for(const auto& pair : holdings) {
             int quantity = pair.second;
             Stock stock = pair.first;
-            totvalue += quantity * stock.price;
+            totvalue += quantity * stock.getPrice();
         }
         return totvalue;
     }
@@ -25,7 +25,7 @@ public:
         if(order.type == OrderType::Buy){
             Stock company = order.stock;
             int quantity = order.quantity;
-            double moneychange = company.price * quantity;
+            double moneychange = company.getPrice() * quantity;
             available_funds -= moneychange;
             holdings[company] += quantity;
         }
@@ -43,7 +43,7 @@ public:
                     ". Instead, selling all available shares";
                     quantity = holdings[company];
                 }
-                double moneychange = company.price * quantity;
+                double moneychange = company.getPrice() * quantity;
                 holdings[company] -= quantity;
                 if(holdings[company]==0){
                     holdings.extract(holdings.find(company));

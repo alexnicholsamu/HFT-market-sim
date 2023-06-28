@@ -4,15 +4,11 @@ class Stock {
 public:
     std::string name;
     double price;
-    double factors;
+    MarketEvent* marketEvent;
 
-    Stock(std::string name, double price, double factors): name(name), price(price), factors(factors) {}
-
-    void marketEffect(double factor){
-        factors = factors * factor;
-    }
+    Stock(std::string name, double price, MarketEvent* marketEvent): name(name), price(price), marketEvent(marketEvent) {}
 
     double getPrice(){
-        return factors*price;
+        return marketEvent->getFactor()*price;
     }
 };
