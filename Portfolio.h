@@ -6,6 +6,7 @@
 #include "stock.h"
 #include "order.h"
 
+
 class Portfolio {
 public:
     std::map<Stock, int> holdings; 

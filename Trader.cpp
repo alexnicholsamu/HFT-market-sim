@@ -68,4 +68,5 @@ public:
     void getTotalValue(){
         std::cout << portfolio.totalFunds(available_cash);
     }
+
 };

@@ -13,4 +13,7 @@ public:
 public:
     Stock(std::string name, double price);
     double getPrice();
+    void updateFactors(double factor);
+    void fluctuate(std::vector<double> fluctuations);
+    void editPrice(double amount, bool dir);
 };

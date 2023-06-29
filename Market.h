@@ -2,6 +2,7 @@
 #include <vector>
 #include <iostream>
 #include <map>
+#include <variant>
 
 #include "Trader.h"
 #include "OrderBook.h"
@@ -11,6 +12,8 @@ public:
     std::vector<Trader> traders;
     OrderBook* orderbook;
     Market(): traders(traders), orderbook(orderbook) {}
-    // ill do orderbook stuff here
-    // basically overarching class
+    void executeOrderBook();
+    void generateMarketEvent(MarketEventType type, double impact);
+    void applyMarketImpact(MarketEvent ME);
+    void addStock(std::string name, double initialPrice);
 };
