@@ -12,14 +12,14 @@ public:
     Market(): traders(traders), orderbook(orderbook), interestRate(interestRate), factors(factors), ME(ME), stocks(stocks) {}
 
     void executeOrderBook(){
-        std::vector<Order> orders = orderbook->executeTrades();
-        Order buyOrder = orders[0];
-        Order sellOrder = orders[1];
-        for(Trader trader : traders){
-            if(trader.id == buyOrder.id){
+        std::vector<Order*> orders = orderbook->executeTrades();
+        Order* buyOrder = orders[0];
+        Order* sellOrder = orders[1];
+        for(Trader& trader : traders){
+            if(trader.id == buyOrder->id){
                 trader.updatePortfolio(buyOrder);
             }
-            if(trader.id == sellOrder.id){
+            if(trader.id == sellOrder->id){
                 trader.updatePortfolio(sellOrder);
             }
         }
@@ -30,7 +30,7 @@ public:
         applyMarketImpact(ME);
     }
 
-    void applyMarketImpact(MarketEvent ME){
+    void applyMarketImpact(MarketEvent& ME){
         switch(ME.type){
             case MarketEventType::InterestRateChange:
                 factors = ME.applyInterestImpact(interestRate, factors);

@@ -8,10 +8,10 @@
 
 class Trade{
 public:
-    Order buyOrder;
-    Order sellOrder;
+    const Order buyOrder;
+    const Order sellOrder;
     std::chrono::system_clock::time_point timestamp;
-    int tradeQuantity;
+    const int tradeQuantity;
 
     Trade(Order buyOrder, Order sellOrder);
 };

@@ -51,6 +51,4 @@ public:
         fluctuation.push_back(chooseDegree);
         return fluctuation;
     }
-
-
 };

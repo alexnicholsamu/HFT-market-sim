@@ -8,7 +8,6 @@ class Stock{
 public:
     std::string name;
     double price;
-    MarketEvent* marketEvent;
 
 public:
     Stock(std::string name, double price);

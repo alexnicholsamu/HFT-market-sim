@@ -17,9 +17,9 @@ public:
 
     Trader(int id, double available_cash, OrderBook* orderbook);
 
-    void makeOrder(OrderType type, Stock stock, int quantity, int id);
-    void updatePortfolio(Order order);
-    void cancelOrder(Order order);
+    void makeOrder(OrderType type, Stock* stock, int quantity, int id);
+    void updatePortfolio(Order* order);
+    void cancelOrder(Order* order);
     void getPositions();
     void getPortfolioValue();
     void getTotalValue();

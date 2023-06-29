@@ -20,17 +20,23 @@ public:
         return portfolioValue() + available_funds;
     }
 
-    double makeChange(Order& order, double available_funds){
-        if(order.type == OrderType::Buy){
-            holdings[&(order.stock)] += order.quantity;  // use & to get address (pointer)
-            std::cout << "Buy order complete!";
+    double makeChange(Order* order, double cash){
+        if(order->type == OrderType::Buy){
+            if(holdings.find(order->stock) != holdings.end()){
+                holdings[order->stock] += order->quantity;
+            }
+            else{
+                holdings[order->stock] = order->quantity;
+            }
         }
         else{
-            double moneychange = order.stock.getPrice() * order.quantity;
-            available_funds += moneychange;
-            std::cout << "Sell order complete!";
+            holdings[order->stock] -= order->quantity;
+            if(holdings[order->stock] == 0){
+                holdings.erase(order->stock);
+            }
         }
-        return available_funds;
+        delete order;
+        return cash;
     }
 
     std::vector<std::string> listCompanies(){
