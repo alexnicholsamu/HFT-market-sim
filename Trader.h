@@ -13,13 +13,13 @@ public:
     Portfolio portfolio;
     int id;
     double available_cash;
-    OrderBook* orderbook;
+    std::shared_ptr<OrderBook> orderbook;
 
-    Trader(int id, double available_cash, OrderBook* orderbook);
+    Trader(int id, double available_cash, std::shared_ptr<OrderBook> orderbook);
 
-    void makeOrder(OrderType type, Stock* stock, int quantity, int id);
-    void updatePortfolio(Order* order);
-    void cancelOrder(Order* order);
+    void makeOrder(OrderType type, std::shared_ptr<Stock> stock, int quantity, int id);
+    void updatePortfolio(std::shared_ptr<Order> order);
+    void cancelOrder(std::shared_ptr<Order> order);
     void getPositions();
     void getPortfolioValue();
     void getTotalValue();

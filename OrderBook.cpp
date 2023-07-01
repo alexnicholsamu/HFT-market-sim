@@ -2,40 +2,40 @@
 
 class OrderBook {
 public:
-    std::priority_queue<Order*, std::vector<Order*>, CompareOrder> buyOrders;
-    std::priority_queue<Order*, std::vector<Order*>, CompareSellOrder> sellOrders;
+    std::priority_queue<std::shared_ptr<Order>, std::vector<std::shared_ptr<Order>>, CompareOrder> buyOrders;
+    std::priority_queue<std::shared_ptr<Order>, std::vector<std::shared_ptr<Order>>, CompareSellOrder> sellOrders;
 
     OrderBook() = default;
 
-    void addBuyOrder(Order* order) {
+    void addBuyOrder(std::shared_ptr<Order> order) {
         buyOrders.push(order);
     }
-    void addSellOrder(Order* order) {
+    void addSellOrder(std::shared_ptr<Order> order) {
         sellOrders.push(order);
     }
 
-    Order* grabBuyOrder() {
+    std::shared_ptr<Order> grabBuyOrder() {
         if(buyOrders.empty()) {
             throw std::out_of_range("No more buy orders");
         }
-        Order* nextOrder = buyOrders.top();
+        std::shared_ptr<Order> nextOrder = buyOrders.top();
         buyOrders.pop();
         return nextOrder;
     }
 
-    Order* grabSellOrder() {
+    std::shared_ptr<Order> grabSellOrder() {
         if(sellOrders.empty()) {
             throw std::out_of_range("No more sell orders");
         }
-        Order* nextOrder = sellOrders.top();
+        std::shared_ptr<Order> nextOrder = sellOrders.top();
         sellOrders.pop();
         return nextOrder;
     }
 
-    std::vector<Order*> executeTrades() {
+    std::vector<std::shared_ptr<Order>> executeTrades() {
         while(!buyOrders.empty() && !sellOrders.empty()) {
-            Order* buyOrder = buyOrders.top();
-            Order* sellOrder = sellOrders.top();
+            std::shared_ptr<Order> buyOrder = buyOrders.top();
+            std::shared_ptr<Order> sellOrder = sellOrders.top();
 
             if(buyOrder->stock == sellOrder->stock && buyOrder->order_price >= sellOrder->order_price) {
                 Trade trade(*buyOrder, *sellOrder);
@@ -57,7 +57,7 @@ public:
                 else{
                     sellOrder->status = OrderStatus::Partial;
                 }
-                std::vector<Order*> orders;
+                std::vector<std::shared_ptr<Order>> orders;
                 orders.push_back(buyOrder);
                 orders.push_back(sellOrder);
                 return orders;
@@ -68,17 +68,16 @@ public:
         }
     }
 
-    bool cancelOrder(Order* order){
+    bool cancelOrder(std::shared_ptr<Order> order){
         if(order->type == OrderType::Buy){
-            std::priority_queue<Order*, std::vector<Order*>, CompareOrder> tempQueue;
+            std::priority_queue<std::shared_ptr<Order>, std::vector<std::shared_ptr<Order>>, CompareOrder> tempQueue;
             bool hadEntry = false;
             while(!buyOrders.empty()){
-                Order* currentEntry = buyOrders.top();
+                std::shared_ptr<Order> currentEntry = buyOrders.top();
                 buyOrders.pop();
                 if(currentEntry->id == order->id && currentEntry->stock == order->stock 
                     && currentEntry->quantity == order->quantity){
                     currentEntry->status = OrderStatus::Cancelled;
-                    delete currentEntry;
                     hadEntry = true;
                 } else {
                     tempQueue.push(currentEntry);
@@ -91,16 +90,16 @@ public:
             return hadEntry;
         }
         else{
-            std::priority_queue<Order*, std::vector<Order*>, CompareSellOrder> tempQueue;
+            std::priority_queue<std::shared_ptr<Order>, std::vector<std::shared_ptr<Order>>, CompareSellOrder> tempQueue;
             bool hadEntry = false;
             while(!sellOrders.empty()){
-                Order* currentEntry = sellOrders.top();
+                std::shared_ptr<Order> currentEntry = sellOrders.top();
                 sellOrders.pop();
                 if(currentEntry->id == order->id && currentEntry->stock == order->stock 
                     && currentEntry->quantity == order->quantity){
                     currentEntry->status = OrderStatus::Cancelled;
-                    delete currentEntry;
                     hadEntry = true;
+                    break;
                 }
                 else{
                     tempQueue.push(currentEntry);

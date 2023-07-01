@@ -4,12 +4,13 @@
 #include <queue>
 #include <set>
 #include <algorithm>
+#include <memory>
 
 #include "Order.h"
 #include "Trade.h"
 
 struct CompareSellOrder {
-    bool operator()(Order* OrderA, Order* OrderB) {
+    bool operator()(std::shared_ptr<Order> OrderA, std::shared_ptr<Order> OrderB) {
         if (OrderA->stock->getPrice() != OrderB->stock->getPrice()) {
             return OrderA->stock->getPrice() < OrderB->stock->getPrice();
         }
@@ -20,7 +21,7 @@ struct CompareSellOrder {
 };
 
 struct CompareOrder {
-    bool operator()(Order* OrderA, Order* OrderB) {
+    bool operator()(std::shared_ptr<Order> OrderA, std::shared_ptr<Order> OrderB) {
         if (OrderA->stock->getPrice() != OrderB->stock->getPrice()) {
             return OrderA->stock->getPrice() > OrderB->stock->getPrice();
         }
@@ -32,16 +33,16 @@ struct CompareOrder {
 
 class OrderBook {
 public:
-    std::priority_queue<Order*, std::vector<Order*>, CompareOrder> buyOrders;
-    std::priority_queue<Order*, std::vector<Order*>, CompareSellOrder> sellOrders;
+    std::priority_queue<std::shared_ptr<Order>, std::vector<std::shared_ptr<Order>>, CompareOrder> buyOrders;
+    std::priority_queue<std::shared_ptr<Order>, std::vector<std::shared_ptr<Order>>, CompareSellOrder> sellOrders;
 
     OrderBook() = default;
 
 public: 
-    void addBuyOrder(Order* order);
-    void addSellOrder(Order* order);
-    Order* grabBuyOrder();
-    Order* grabSellOrder();
-    std::vector<Order*> executeTrades();
-    bool cancelOrder(Order* order);
+    void addBuyOrder(std::shared_ptr<Order> order);
+    void addSellOrder(std::shared_ptr<Order> order);
+    std::shared_ptr<Order> grabBuyOrder();
+    std::shared_ptr<Order> grabSellOrder();
+    std::vector<std::shared_ptr<Order>> executeTrades();
+    bool cancelOrder(std::shared_ptr<Order> order);
 };

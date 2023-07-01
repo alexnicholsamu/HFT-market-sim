@@ -3,18 +3,18 @@
 class Market{
 public:
     std::vector<Trader> traders;
-    OrderBook* orderbook;
+    std::shared_ptr<OrderBook> orderbook;
     double interestRate = 1.0;
     double factors = 1.0;
     MarketEvent ME;
-    std::map<std::string, Stock*> stocks;
+    std::map<std::string, std::shared_ptr<Stock>> stocks;
 
     Market(): traders(traders), orderbook(orderbook), interestRate(interestRate), factors(factors), ME(ME), stocks(stocks) {}
 
     void executeOrderBook(){
-        std::vector<Order*> orders = orderbook->executeTrades();
-        Order* buyOrder = orders[0];
-        Order* sellOrder = orders[1];
+        std::vector<std::shared_ptr<Order>> orders = orderbook->executeTrades();
+        std::shared_ptr<Order> buyOrder = orders[0];
+        std::shared_ptr<Order> sellOrder = orders[1];
         for(Trader& trader : traders){
             if(trader.id == buyOrder->id){
                 trader.updatePortfolio(buyOrder);
@@ -46,7 +46,7 @@ public:
     }
 
     void addStock(std::string name, double initialPrice){
-        Stock* newStock = new Stock(name, initialPrice);
+        std::shared_ptr<Stock> newStock = std::make_shared<Stock>(name, initialPrice);
         stocks[name] = newStock;
     }
   

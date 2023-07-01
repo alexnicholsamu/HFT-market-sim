@@ -5,13 +5,13 @@ public:
     Portfolio portfolio;
     int id;
     double available_cash;
-    OrderBook* orderbook;
+    std::shared_ptr<OrderBook> orderbook;
 
-    Trader(int id, double available_cash, OrderBook* orderbook): portfolio(portfolio), id(id), 
+    Trader(int id, double available_cash, std::shared_ptr<OrderBook> orderbook): portfolio(portfolio), id(id), 
         available_cash(available_cash), orderbook(orderbook) {}
     
-    void makeOrder(OrderType type, Stock* stock, int quantity, int id){
-        Order* order = new Order(type, stock, quantity, id);
+    void makeOrder(OrderType type, std::shared_ptr<Stock> stock, int quantity, int id){
+        std::shared_ptr<Order> order = std::make_shared<Order>(type, stock, quantity, id);
         double order_price = order->order_price;  // use the price at the time of order creation
         if(order->type == OrderType::Buy){
             double moneychange = order_price * quantity;
@@ -44,14 +44,14 @@ public:
         }
     }
 
-    void cancelOrder(Order* order){
+    void cancelOrder(std::shared_ptr<Order> order){
         bool cancel = orderbook->cancelOrder(order);
         if(cancel && order->type == OrderType::Buy){
             available_cash += order->order_price * order->quantity;  // use the price at the time of order creation
         }
     }
 
-    void updatePortfolio(Order* order){
+    void updatePortfolio(std::shared_ptr<Order> order){
         available_cash = portfolio.makeChange(order, available_cash);
     }
 

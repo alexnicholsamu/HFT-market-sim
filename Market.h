@@ -10,7 +10,7 @@
 class Market{
 public:
     std::vector<Trader> traders;
-    OrderBook* orderbook;
+    std::shared_ptr<OrderBook> orderbook;
     Market(): traders(traders), orderbook(orderbook) {}
     void executeOrderBook();
     void generateMarketEvent(MarketEventType type, double impact);
