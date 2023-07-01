@@ -5,7 +5,7 @@ public:
     std::map<std::shared_ptr<Stock>, int> holdings;  // changed to pointers
     std::mutex mtx;
 
-    Portfolio(): holdings(holdings) {}
+    Portfolio() {}
 
     double portfolioValue(){
         double totvalue = 0;

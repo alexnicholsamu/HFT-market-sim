@@ -2,6 +2,7 @@
 #include <vector>
 #include <map>
 #include <memory>
+#include <mutex>
 
 #include "MarketEvent.h"
 
@@ -9,6 +10,7 @@ class Stock{
 public:
     std::string name;
     double price;
+    std::mutex mtx;
 
 public:
     Stock(std::string name, double price);

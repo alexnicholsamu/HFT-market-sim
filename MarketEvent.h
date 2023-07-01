@@ -6,7 +6,8 @@
 #include <random>
 #include <variant>
 
-enum class MarketEventType { InterestRateChange, Fluctuation };
+enum class MarketEventType { InterestRateChange, GlobalEconomy, EconomicIndicatorReports, 
+    PublicOpinion, Recession, Prosperity, OtherGovPolicy };
 
 class MarketEvent{
 public: 

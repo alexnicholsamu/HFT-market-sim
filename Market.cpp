@@ -29,6 +29,15 @@ public:
     void generateMarketEvent(MarketEventType type, double impact){
         ME = MarketEvent(type, impact);
         applyMarketImpact(ME);
+        std::chrono::seconds sleepDuration(40);
+        std::this_thread::sleep_for(sleepDuration);
+    }
+
+    void fluctuateMarket(){
+        std::vector<double> fluctuations = ME.generateRandomChange();
+        for (auto& pair : stocks) { // directly apply fluctuations to stocks
+            pair.second->fluctuate(fluctuations);
+        }
     }
 
     void applyMarketImpact(MarketEvent& ME){
@@ -39,27 +48,35 @@ public:
                 for (auto& pair : stocks) { // directly apply fluctuations to stocks
                     pair.second->updateFactors(factors);
                 }
-            case MarketEventType::Fluctuation:
-                std::vector<double> fluctuations = ME.generateRandomChange();
-                for (auto& pair : stocks) { // directly apply fluctuations to stocks
-                    pair.second->fluctuate(fluctuations);
-                }
+            case MarketEventType::GlobalEconomy:
+            case MarketEventType::EconomicIndicatorReports:
+            case MarketEventType::PublicOpinion:
+            case MarketEventType::Recession:
+            case MarketEventType::Prosperity:
+            case MarketEventType::OtherGovPolicy:
         }
     }
 
     void addStock(std::string name, double initialPrice){
         std::shared_ptr<Stock> newStock = std::make_shared<Stock>(name, initialPrice);
         stocks[name] = newStock;
+        std::chrono::seconds sleepDuration(20);
+        std::this_thread::sleep_for(sleepDuration);
     }
 
     void run(){
-        
+        bool running = true;
+        while(running){
+
+        }
     }
 
     void addTrader(){
         double id;
         double available_cash;
         traders.push_back(Trader(id, available_cash, orderbook));
+        std::chrono::seconds sleepDuration(60);
+        std::this_thread::sleep_for(sleepDuration);
     }
 
     void reset(){

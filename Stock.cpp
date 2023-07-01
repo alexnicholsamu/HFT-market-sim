@@ -7,18 +7,22 @@ public:
     double factors = 1.0;
     std::random_device rd;
     std::mt19937 generator;
+    std::mutex mtx;
 
     Stock(std::string name, double price): name(name), price(price), rd(), generator(rd()) {}
 
     double getPrice(){
+        std::lock_guard<std::mutex> lock(mtx);
         return factors*price;
     }
 
     void updateFactors(double factor){
+        std::lock_guard<std::mutex> lock(mtx);
         factors = factor;
     }
 
     void fluctuate(std::vector<double> fluctuations){
+        std::lock_guard<std::mutex> lock(mtx);
         std::uniform_int_distribution<double> distribution(0.0, 1.0);
         double stockCheck = distribution(generator);
         double degreeCheck = distribution(generator);

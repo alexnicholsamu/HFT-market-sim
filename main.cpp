@@ -10,3 +10,11 @@ class Stock;
 class Trade;
 class MarketEvent;
 class Portfolio;
+
+#include <thread>
+#include <iostream>
+
+int main() {
+    unsigned int n = std::thread::hardware_concurrency();
+    std::cout << n << std::endl;
+}
