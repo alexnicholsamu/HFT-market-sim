@@ -17,7 +17,7 @@ public:
 
     Trader(int id, double available_cash, std::shared_ptr<OrderBook> orderbook);
 
-    void makeOrder(OrderType type, std::shared_ptr<Stock> stock, int quantity, int id);
+    void makeOrder(OrderType type, std::shared_ptr<Stock> stock, int quantity, int id, OrderPreference pref);
     void updatePortfolio(std::shared_ptr<Order> order);
     void cancelOrder(std::shared_ptr<Order> order);
     void getPositions();

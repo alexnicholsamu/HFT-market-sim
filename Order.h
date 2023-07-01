@@ -8,6 +8,7 @@
 
 enum class OrderType { Buy, Sell };
 enum class OrderStatus { Open, Partial, Closed, Cancelled };
+enum class OrderPreference { Limit, Market};
 
 class Order{
 public:
@@ -18,6 +19,7 @@ public:
     int id;
     double order_price;
     std::chrono::system_clock::time_point timestamp;
+    OrderPreference pref;
 public:
-    Order(OrderType type, std::shared_ptr<Stock> stock, int quantity, int id);
+    Order(OrderType type, std::shared_ptr<Stock> stock, int quantity, int id, OrderPreference pref);
 };

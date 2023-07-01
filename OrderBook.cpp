@@ -4,32 +4,17 @@ class OrderBook {
 public:
     std::priority_queue<std::shared_ptr<Order>, std::vector<std::shared_ptr<Order>>, CompareOrder> buyOrders;
     std::priority_queue<std::shared_ptr<Order>, std::vector<std::shared_ptr<Order>>, CompareSellOrder> sellOrders;
-
+    std::mutex mtx;
     OrderBook() = default;
 
-    void addBuyOrder(std::shared_ptr<Order> order) {
-        buyOrders.push(order);
-    }
-    void addSellOrder(std::shared_ptr<Order> order) {
-        sellOrders.push(order);
-    }
-
-    std::shared_ptr<Order> grabBuyOrder() {
-        if(buyOrders.empty()) {
-            throw std::out_of_range("No more buy orders");
+    void addOrder(std::shared_ptr<Order> order) {
+        std::lock_guard<std::mutex> lock(mtx);
+        switch (order->type){
+            case OrderType::Buy:
+                buyOrders.push(order);
+            case OrderType::Sell:
+                sellOrders.push(order);
         }
-        std::shared_ptr<Order> nextOrder = buyOrders.top();
-        buyOrders.pop();
-        return nextOrder;
-    }
-
-    std::shared_ptr<Order> grabSellOrder() {
-        if(sellOrders.empty()) {
-            throw std::out_of_range("No more sell orders");
-        }
-        std::shared_ptr<Order> nextOrder = sellOrders.top();
-        sellOrders.pop();
-        return nextOrder;
     }
 
     std::vector<std::shared_ptr<Order>> executeTrades() {
@@ -37,7 +22,14 @@ public:
             std::shared_ptr<Order> buyOrder = buyOrders.top();
             std::shared_ptr<Order> sellOrder = sellOrders.top();
 
-            if(buyOrder->stock == sellOrder->stock && buyOrder->order_price >= sellOrder->order_price) {
+            // Check if the orders are for the same stock
+            if(buyOrder->stock->name != sellOrder->stock->name) {
+                break;
+            }
+            
+            // Proceed only if the prices match or if one of the orders is a market order
+            if(buyOrder->order_price >= sellOrder->order_price || buyOrder->pref == OrderPreference::Market 
+                || sellOrder->pref == OrderPreference::Market) {
                 Trade trade(*buyOrder, *sellOrder);
 
                 buyOrder->quantity -= trade.tradeQuantity;
@@ -47,14 +39,14 @@ public:
                     buyOrders.pop();
                     buyOrder->status = OrderStatus::Closed;
                 }
-                else{
+                else {
                     buyOrder->status = OrderStatus::Partial;
                 }
                 if(sellOrder->quantity == 0) {
                     sellOrders.pop();
                     sellOrder->status = OrderStatus::Closed;
                 }
-                else{
+                else {
                     sellOrder->status = OrderStatus::Partial;
                 }
                 std::vector<std::shared_ptr<Order>> orders;
@@ -76,7 +68,7 @@ public:
                 std::shared_ptr<Order> currentEntry = buyOrders.top();
                 buyOrders.pop();
                 if(currentEntry->id == order->id && currentEntry->stock == order->stock 
-                    && currentEntry->quantity == order->quantity){
+                    && currentEntry->quantity == order->quantity && !hadEntry){
                     currentEntry->status = OrderStatus::Cancelled;
                     hadEntry = true;
                 } else {
@@ -96,10 +88,9 @@ public:
                 std::shared_ptr<Order> currentEntry = sellOrders.top();
                 sellOrders.pop();
                 if(currentEntry->id == order->id && currentEntry->stock == order->stock 
-                    && currentEntry->quantity == order->quantity){
+                    && currentEntry->quantity == order->quantity && !hadEntry){
                     currentEntry->status = OrderStatus::Cancelled;
                     hadEntry = true;
-                    break;
                 }
                 else{
                     tempQueue.push(currentEntry);
@@ -111,5 +102,10 @@ public:
             sellOrders = tempQueue;
             return hadEntry;
         }
+    }
+
+    void clear(){
+        std::priority_queue<std::shared_ptr<Order>, std::vector<std::shared_ptr<Order>>, CompareOrder>().swap(buyOrders);
+        std::priority_queue<std::shared_ptr<Order>, std::vector<std::shared_ptr<Order>>, CompareSellOrder>().swap(sellOrders);
     }
 };

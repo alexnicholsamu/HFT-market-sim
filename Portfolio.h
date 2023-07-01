@@ -2,14 +2,16 @@
 #include <vector>
 #include <iostream>
 #include <map>
+#include <mutex>
 
-#include "stock.h"
-#include "order.h"
+#include "Stock.h"
+#include "Order.h"
 
 
 class Portfolio {
 public:
     std::map<std::shared_ptr<Stock>, int> holdings; 
+    std::mutex mtx;
 
 public:
     Portfolio();
@@ -17,4 +19,5 @@ public:
     double totalFunds(double available_funds);
     double makeChange(std::shared_ptr<Order> order, double available_funds);
     std::vector<std::string> listCompanies();
+    void clear();
 };

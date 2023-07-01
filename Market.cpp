@@ -6,6 +6,7 @@ public:
     std::shared_ptr<OrderBook> orderbook;
     double interestRate = 1.0;
     double factors = 1.0;
+    std::mutex mtx;
     MarketEvent ME;
     std::map<std::string, std::shared_ptr<Stock>> stocks;
 
@@ -31,6 +32,7 @@ public:
     }
 
     void applyMarketImpact(MarketEvent& ME){
+        std::lock_guard<std::mutex> lock(mtx);
         switch(ME.type){
             case MarketEventType::InterestRateChange:
                 factors = ME.applyInterestImpact(interestRate, factors);
@@ -49,5 +51,20 @@ public:
         std::shared_ptr<Stock> newStock = std::make_shared<Stock>(name, initialPrice);
         stocks[name] = newStock;
     }
-  
+
+    void run(){
+        
+    }
+
+    void addTrader(){
+        double id;
+        double available_cash;
+        traders.push_back(Trader(id, available_cash, orderbook));
+    }
+
+    void reset(){
+        traders.clear();
+        stocks.clear();
+        orderbook->clear();
+    }
 };

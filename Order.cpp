@@ -9,9 +9,10 @@ public:
     OrderStatus status = OrderStatus::Open;
     int id;
     std::chrono::system_clock::time_point timestamp;
+    OrderPreference pref;
 
-    Order(OrderType type, std::shared_ptr<Stock> stock, int quantity, int id): type(type), 
+    Order(OrderType type, std::shared_ptr<Stock> stock, int quantity, int id, OrderPreference pref): type(type), 
         stock(stock), quantity(quantity), status(status), id(id), 
         order_price(stock->getPrice()),  // get the price at the time of order creation
-        timestamp(std::chrono::system_clock::now()) {}
+        timestamp(std::chrono::system_clock::now()), pref(pref) {}
 };

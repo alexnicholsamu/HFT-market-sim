@@ -5,6 +5,8 @@
 #include <set>
 #include <algorithm>
 #include <memory>
+#include <mutex>
+
 
 #include "Order.h"
 #include "Trade.h"
@@ -35,14 +37,12 @@ class OrderBook {
 public:
     std::priority_queue<std::shared_ptr<Order>, std::vector<std::shared_ptr<Order>>, CompareOrder> buyOrders;
     std::priority_queue<std::shared_ptr<Order>, std::vector<std::shared_ptr<Order>>, CompareSellOrder> sellOrders;
-
+    std::mutex mtx;
     OrderBook() = default;
 
 public: 
-    void addBuyOrder(std::shared_ptr<Order> order);
-    void addSellOrder(std::shared_ptr<Order> order);
-    std::shared_ptr<Order> grabBuyOrder();
-    std::shared_ptr<Order> grabSellOrder();
+    void addOrder(std::shared_ptr<Order> order);
     std::vector<std::shared_ptr<Order>> executeTrades();
     bool cancelOrder(std::shared_ptr<Order> order);
+    void clear();
 };

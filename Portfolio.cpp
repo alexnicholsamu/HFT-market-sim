@@ -3,6 +3,7 @@
 class Portfolio {
 public: 
     std::map<std::shared_ptr<Stock>, int> holdings;  // changed to pointers
+    std::mutex mtx;
 
     Portfolio(): holdings(holdings) {}
 
@@ -21,6 +22,7 @@ public:
     }
 
     double makeChange(std::shared_ptr<Order> order, double cash){
+        std::lock_guard<std::mutex> lock(mtx);
         if(order->type == OrderType::Buy){
             if(holdings.find(order->stock) != holdings.end()){
                 holdings[order->stock] += order->quantity;

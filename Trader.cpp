@@ -7,17 +7,18 @@ public:
     double available_cash;
     std::shared_ptr<OrderBook> orderbook;
 
-    Trader(int id, double available_cash, std::shared_ptr<OrderBook> orderbook): portfolio(portfolio), id(id), 
-        available_cash(available_cash), orderbook(orderbook) {}
+    Trader(int id, double available_cash, std::shared_ptr<OrderBook> orderbook): 
+        id(id), available_cash(available_cash), orderbook(orderbook) {}
+
     
-    void makeOrder(OrderType type, std::shared_ptr<Stock> stock, int quantity, int id){
-        std::shared_ptr<Order> order = std::make_shared<Order>(type, stock, quantity, id);
+    void makeOrder(OrderType type, std::shared_ptr<Stock> stock, int quantity, int id, OrderPreference pref){
+        std::shared_ptr<Order> order = std::make_shared<Order>(type, stock, quantity, id, pref);
         double order_price = order->order_price;  // use the price at the time of order creation
         if(order->type == OrderType::Buy){
             double moneychange = order_price * quantity;
             if(moneychange <= available_cash){
                 available_cash -= moneychange;
-                orderbook->addBuyOrder(order);
+                orderbook->addOrder(order);
             }
             else{
                 std::cout << "Insufficient funds available. Funds needed for order: " 
@@ -39,7 +40,7 @@ public:
                 if(portfolio.holdings[stock]==0){
                     portfolio.holdings.erase(stock);
                 }
-                orderbook->addSellOrder(order);
+                orderbook->addOrder(order);
             }
         }
     }
