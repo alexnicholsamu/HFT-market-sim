@@ -9,8 +9,11 @@ public:
     std::mutex mtx;
     MarketEvent ME;
     std::map<std::string, std::shared_ptr<Stock>> stocks;
+    std::random_device rd;
+    std::mt19937 generator;
 
-    Market(): traders(traders), orderbook(orderbook), interestRate(interestRate), factors(factors), ME(ME), stocks(stocks) {}
+    Market(): traders(traders), orderbook(orderbook), interestRate(interestRate), factors(factors), 
+        ME(ME), stocks(stocks), rd(), generator(rd()) {}
 
     void executeOrderBook(){
         std::vector<std::shared_ptr<Order>> orders = orderbook->executeTrades();
@@ -26,34 +29,98 @@ public:
         }
     }
 
-    void generateMarketEvent(MarketEventType type, double impact){
-        ME = MarketEvent(type, impact);
+    void generateMarketEvent(std::map<double, MarketEventType> MEcreation){
+        std::lock_guard<std::mutex> lock(mtx);
+        std::uniform_int_distribution<double> distribution(0.0, 1.0);
+        double marketEvent = distribution(generator);
+        for(auto& pair : MEcreation){
+            if (marketEvent <= pair.first) {
+                ME = MarketEvent(pair.second);
+                break;
+            }
+        }
         applyMarketImpact(ME);
         std::chrono::seconds sleepDuration(40);
         std::this_thread::sleep_for(sleepDuration);
     }
 
     void fluctuateMarket(){
-        std::vector<double> fluctuations = ME.generateRandomChange();
+        std::vector<double> marketFluctuations = ME.generateRandomChange();
         for (auto& pair : stocks) { // directly apply fluctuations to stocks
-            pair.second->fluctuate(fluctuations);
+            pair.second->fluctuate(marketFluctuations);
         }
+        std::chrono::seconds sleepDuration(2);
+        std::this_thread::sleep_for(sleepDuration);
     }
 
     void applyMarketImpact(MarketEvent& ME){
-        std::lock_guard<std::mutex> lock(mtx);
+        double impact;
+        std::vector<double> fluctuations;
         switch(ME.type){
             case MarketEventType::InterestRateChange:
-                factors = ME.applyInterestImpact(interestRate, factors);
+                std::uniform_int_distribution<double> interestDistribution(-4.0, 4.0);
+                impact = interestDistribution(generator);
+                factors = ME.applyInterestImpact(interestRate, factors, impact);
                 for (auto& pair : stocks) { // directly apply fluctuations to stocks
                     pair.second->updateFactors(factors);
                 }
+                break;
             case MarketEventType::GlobalEconomy:
+                std::uniform_int_distribution<double> GEdistribution(0.0, 0.25);
+                impact = GEdistribution(generator);
+                factors = ME.applyGlobalEconomy(factors, impact);
+                for (auto& pair : stocks) { // directly apply fluctuations to stocks
+                    pair.second->updateFactors(factors);
+                }
+                break;
             case MarketEventType::EconomicIndicatorReports:
+                std::uniform_int_distribution<double> EIRdistribution(0.25, 0.50);
+                impact = EIRdistribution(generator);
+                for (auto& pair : stocks) { // directly apply fluctuations to stocks
+                    pair.second->econIndicators(factors, impact);
+                }
+                break;
             case MarketEventType::PublicOpinion:
+                std::uniform_int_distribution<double> lowdistribution(0.00, 0.60);
+                std::uniform_int_distribution<double> highdistribution(0.40, 1.0);
+                std::uniform_int_distribution<double> distribution(0.00, 1.0);
+                double highlow = distribution(generator);
+                double high = highdistribution(generator);
+                double low = lowdistribution(generator);
+                if(highlow<0.5){
+                    fluctuations.push_back(highlow);
+                    fluctuations.push_back(low);
+                    fluctuations.push_back(highlow);
+                }
+                else{
+                    fluctuations.push_back(highlow);
+                    fluctuations.push_back(high);
+                    fluctuations.push_back(highlow);
+                }
+                for (auto& pair : stocks) { // directly apply fluctuations to stocks
+                    pair.second->fluctuate(fluctuations);
+                }
+                break;
             case MarketEventType::Recession:
+                for (auto& pair : stocks) { // directly apply fluctuations to stocks
+                    pair.second->updateFactors(factors*0.70);
+                }
+                break;
             case MarketEventType::Prosperity:
+                for (auto& pair : stocks) { // directly apply fluctuations to stocks
+                    pair.second->updateFactors(factors*1.30);
+                }
+                break;
             case MarketEventType::OtherGovPolicy:
+                std::uniform_int_distribution<double> GEdistribution(0.0, 0.25);
+                impact = GEdistribution(generator);
+                factors = ME.applyGovImpact(factors, impact);
+                for (auto& pair : stocks) { // directly apply fluctuations to stocks
+                    pair.second->updateFactors(factors);
+                }
+                break;
+            case MarketEventType::Nothing:
+                break;
         }
     }
 
@@ -75,8 +142,6 @@ public:
         double id;
         double available_cash;
         traders.push_back(Trader(id, available_cash, orderbook));
-        std::chrono::seconds sleepDuration(60);
-        std::this_thread::sleep_for(sleepDuration);
     }
 
     void reset(){

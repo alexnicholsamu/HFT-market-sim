@@ -7,16 +7,15 @@
 #include <variant>
 
 enum class MarketEventType { InterestRateChange, GlobalEconomy, EconomicIndicatorReports, 
-    PublicOpinion, Recession, Prosperity, OtherGovPolicy };
+    PublicOpinion, Recession, Prosperity, OtherGovPolicy, Nothing };
 
 class MarketEvent{
 public: 
     MarketEventType type;
-    double impact;
-    double interestRate = 1.0;
-    double factors = 1.0;
-    MarketEvent(MarketEventType type, double impact);
-    double applyInterestImpact(double interestRate, double factors);
+    MarketEvent(MarketEventType type);
+    double applyInterestImpact(double interestRate, double factors, double impact);
     double interestFactor(double factor, double factors);
+    double applyGlobalEconomy(double factor, double impact);
     std::vector<double> generateRandomChange();
+    double applyGovImpact(double factor, double impact);
 };

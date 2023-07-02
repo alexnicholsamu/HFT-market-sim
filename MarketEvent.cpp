@@ -3,13 +3,13 @@
 class MarketEvent {
 public:
     MarketEventType type;
-    double impact;
+    
     std::random_device rd;
     std::mt19937 generator;
 
-    MarketEvent(MarketEventType type, double impact): type(type), impact(impact), rd(), generator(rd()) {}
+    MarketEvent(MarketEventType type): type(type), rd(), generator(rd()) {}
 
-    double applyInterestImpact(double interestRate, double factors) {
+    double applyInterestImpact(double interestRate, double factors, double impact) {
         double oldIR = interestRate;
         interestRate += impact;
         if(interestRate < 0.01){
@@ -22,6 +22,15 @@ public:
         }
         double change = interestRate / oldIR; 
         return interestFactor(change, factors);
+    }
+
+    double applyGlobalEconomy(double factor, double impact){
+        if(factor < 1.0){
+            return factor*(1-impact);
+        }
+        else{
+            return factor*(1+impact);
+        }
     }
 
     double interestFactor(double factor, double factors){ 
@@ -38,6 +47,15 @@ public:
             factors *= ((1/log2(factor))/2);
         }
         return factors;
+    }
+
+    double applyGovImpact(double factor, double impact){
+        if(factor < 1.0){
+            return factor*(1+impact);
+        }
+        else{
+            return factor*(1-impact);
+        }
     }
 
     std::vector<double> generateRandomChange(){

@@ -18,4 +18,5 @@ public:
     void updateFactors(double factor);
     void fluctuate(std::vector<double> fluctuations);
     void editPrice(double amount, bool dir);
+    void econIndicators(double factors, double impact);
 };

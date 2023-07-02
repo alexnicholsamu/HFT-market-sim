@@ -28,7 +28,7 @@ public:
         double degreeCheck = distribution(generator);
         bool pos = true;
         if(stockCheck > (fluctuations[0]/3)){
-            if(0.5 < fluctuations[1]){
+            if(0.5 > fluctuations[1]){
                 pos = false;
             }
             if(degreeCheck > fluctuations[2]){
@@ -46,6 +46,15 @@ public:
         }
         else{
             price *= (1 - amount);
+        }
+    }
+
+    void econIndicators(double factors, double impact){
+        std::uniform_int_distribution<double> distribution(0.0, factors*2);
+        double econReport = distribution(generator);
+        double affectStock = 0.5;
+        if(econReport>affectStock){
+            updateFactors(factors*(impact+econReport));
         }
     }
 };
