@@ -2,8 +2,14 @@
 
 # run in ubuntu terminal
 
-rm -f simulation.exe
+echo "Deleting old main.exe, if it exists"
 
-g++ -std=c++17 -pthread *.cpp *.h -o simulation.exe
+rm -f main.exe
 
-./simulation.exe
+echo "Starting build, may take a little while"
+
+g++ -std=c++17 -pthread *.cpp *.h -o main.exe
+
+echo "File build complete, running main.exe"
+
+./main.exe
