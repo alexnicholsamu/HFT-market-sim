@@ -1,13 +1,6 @@
 #ifndef TRADE_H
 #define TRADE_H
 
-#include <queue>
-#include <vector>
-#include <iostream>
-#include <map>
-#include <chrono>
-#include <thread>
-
 #include "Order.h"
 
 class Trade{

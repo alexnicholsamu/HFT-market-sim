@@ -1,19 +1,9 @@
 #ifndef MARKET_H
 #define MARKET_H
 
-#include <queue>
-#include <vector>
-#include <iostream>
-#include <map>
-#include <variant>
-#include <chrono>
-#include <thread>
-#include <fstream>
-#include <atomic>
-#include <mutex>
+
 
 #include "Trader.h"
-#include "OrderBook.h"
 
 enum class MarketEventType { InterestRateChange, GlobalEconomy, EconomicIndicatorReports, 
     PublicOpinion, Recession, Prosperity, OtherGovPolicy, Nothing };
@@ -21,7 +11,7 @@ enum class MarketEventType { InterestRateChange, GlobalEconomy, EconomicIndicato
 class Market{
 public:
     std::random_device rd;
-    std::mt19937 generator();
+    std::mt19937 generator;
     std::vector<std::shared_ptr<Trader>> traders;
     std::mutex mtx;
     double interestRate = 1.0;

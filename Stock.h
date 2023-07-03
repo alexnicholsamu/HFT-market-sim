@@ -1,15 +1,24 @@
 #ifndef STOCK_H
 #define STOCK_H
 
+#include <iostream>
 #include <string>
 #include <vector>
 #include <map>
 #include <memory>
-#include <mutex>
 #include <cmath>
 #include <random>
 #include <variant>
 #include <atomic>
+#include <queue>
+#include <chrono>
+#include <thread>
+#include <fstream>
+#include <atomic>
+#include <cmath>
+#include <set>
+#include <algorithm>
+#include <mutex>
 
 class Stock{
 public:

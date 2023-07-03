@@ -1,11 +1,6 @@
 #ifndef TRADER_H
 #define TRADER_H
 
-#include <queue>
-#include <vector>
-#include <iostream>
-#include <map>
-
 #include "Portfolio.h"
 #include "Trade.h"
 #include "OrderBook.h"

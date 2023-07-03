@@ -9,12 +9,6 @@
 #include "Trader.h"
 #include "Market.h"
 
-#include <memory>
-#include <queue>
-#include <vector>
-#include <iostream>
-#include <map>
-
 class Market;
 class OrderBook;
 enum class MarketEventType;

@@ -1,12 +1,6 @@
 #ifndef ORDER_H
 #define ORDER_H
 
-#include <string>
-#include <vector>
-#include <map>
-#include <chrono>
-#include <memory>
-
 #include "Stock.h"
 
 enum class OrderType { Buy, Sell };
