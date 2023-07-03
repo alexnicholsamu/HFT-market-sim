@@ -179,6 +179,7 @@ std::map<double,MarketEventType> Market::generateMarketEventChances(){
 }
 
 void Market::run(){
+    std::cout << "Setting up simulation!"<< std::endl;
     std::atomic<bool> running(true);
     initializeTraders("traders.txt");
     initializeStocks("stocks.txt");
@@ -186,6 +187,8 @@ void Market::run(){
     std::vector<std::thread> threads;
 
     auto start = std::chrono::steady_clock::now();
+
+    std::cout << "Starting Simulation!" << std::endl;
 
     std::thread METhread([this, &start, &running, marketEventChance] {
         while (running) {
@@ -260,6 +263,7 @@ void Market::initializeTraders(std::string filename) {
         traders.push_back(std::make_shared<Trader>(id, cash, orderbook));
     }
     file.close();
+    std::cout << "Initializing Traders!" << std::endl;
 }
 
 void Market::initializeStocks(std::string filename) {
@@ -270,4 +274,5 @@ void Market::initializeStocks(std::string filename) {
         stocks.push_back(std::make_shared<Stock>(name, price));
     }
     file.close();
+    std::cout << "Initializing Stocks!" << std::endl;
 }
