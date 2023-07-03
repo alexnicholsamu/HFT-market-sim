@@ -170,10 +170,12 @@ std::map<double,MarketEventType> Market::generateMarketEventChances(){
 }
 
 void Market::run(){
+    std::cout << "Checkpoint 1.5";
     std::atomic<bool> running(true);
     initializeTraders("traders.txt");
     initializeStocks("stocks.txt");
     std::map<double,MarketEventType> marketEventChance = generateMarketEventChances();
+    std::cout << "Checkpoint 1.75";
     std::vector<std::thread> threads;
 
     std::cout << "Checkpoint 2";
