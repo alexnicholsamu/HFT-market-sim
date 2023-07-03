@@ -1,9 +1,0 @@
-#!/bin/bash
-
-# Bash script to manage data feed
-
-# Copy the new data feed into the data directory
-cp /path/to/new/data/feed.csv /path/to/data/directory
-
-# Call the simulator with the new data feed
-./simulator /path/to/data/directory/feed.csv
