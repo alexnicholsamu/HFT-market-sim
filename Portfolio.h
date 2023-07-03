@@ -16,8 +16,7 @@ public:
 public:
     Portfolio();
     double portfolioValue();
-    double totalFunds(double available_funds);
-    double makeChange(std::shared_ptr<Order> order, double available_funds);
-    std::vector<std::string> listCompanies();
-    void clear();
+    double makeChange(std::shared_ptr<Order> order, double cash);
+    std::vector<std::shared_ptr<Stock>> listStocks();
+    void cancelSell(std::shared_ptr<Order> order);
 };

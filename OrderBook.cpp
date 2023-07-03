@@ -18,6 +18,7 @@ public:
     }
 
     std::vector<std::shared_ptr<Order>> executeTrades() {
+        std::lock_guard<std::mutex> lock(mtx);
         while(!buyOrders.empty() && !sellOrders.empty()) {
             std::shared_ptr<Order> buyOrder = buyOrders.top();
             std::shared_ptr<Order> sellOrder = sellOrders.top();
@@ -30,7 +31,7 @@ public:
             // Proceed only if the prices match or if one of the orders is a market order
             if(buyOrder->order_price >= sellOrder->order_price || buyOrder->pref == OrderPreference::Market 
                 || sellOrder->pref == OrderPreference::Market) {
-                Trade trade(*buyOrder, *sellOrder);
+                Trade trade(buyOrder, sellOrder);
 
                 buyOrder->quantity -= trade.tradeQuantity;
                 sellOrder->quantity -= trade.tradeQuantity;

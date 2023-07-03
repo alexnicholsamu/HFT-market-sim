@@ -13,13 +13,13 @@ enum class OrderPreference { Limit, Market};
 class Order{
 public:
     OrderType type;
-    std::shared_ptr<Stock> stock;
+    std::shared_ptr<Stock> stock;  // changed to pointer
+    double order_price;  // added this field to hold the static price at the time the order is created
     int quantity;
     OrderStatus status = OrderStatus::Open;
     int id;
-    double order_price;
     std::chrono::system_clock::time_point timestamp;
     OrderPreference pref;
-public:
+
     Order(OrderType type, std::shared_ptr<Stock> stock, int quantity, int id, OrderPreference pref);
 };

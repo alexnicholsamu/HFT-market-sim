@@ -17,22 +17,14 @@ public:
         return totvalue;
     }
 
-    double totalFunds(double available_funds){
-        return portfolioValue() + available_funds;
-    }
-
     double makeChange(std::shared_ptr<Order> order, double cash){
         std::lock_guard<std::mutex> lock(mtx);
         if(order->type == OrderType::Buy){
-            if(holdings.find(order->stock) != holdings.end()){
-                holdings[order->stock] += order->quantity;
-            }
-            else{
-                holdings[order->stock] = order->quantity;
-            }
+            holdings[order->stock] += order->quantity;
         }
         else{
             holdings[order->stock] -= order->quantity;
+            cash += order-> order_price * order->quantity;
             if(holdings[order->stock] == 0){
                 holdings.erase(order->stock);
             }
@@ -40,11 +32,15 @@ public:
         return cash;
     }
 
-    std::vector<std::string> listCompanies(){
-        std::vector<std::string> listComps;
+    void cancelSell(std::shared_ptr<Order> order){
+        holdings[order->stock] += order->quantity;
+    }
+
+    std::vector<std::shared_ptr<Stock>> listStocks(){
+        std::vector<std::shared_ptr<Stock>> listComps;
         for(const auto& pair : holdings) {
             std::shared_ptr<Stock> stock = pair.first;  // changed to pointer
-            listComps.push_back(stock->name);  // use -> instead of .
+            listComps.push_back(stock);  // use -> instead of .
         }
         return listComps;
     }
