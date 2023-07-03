@@ -1,3 +1,6 @@
+#ifndef MAIN_H
+#define MAIN_H
+
 #include "Portfolio.h"
 #include "Order.h"
 #include "Trade.h"
@@ -13,3 +16,5 @@
 #include <map>
 
 int main();
+
+#endif

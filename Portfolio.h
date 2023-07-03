@@ -1,3 +1,6 @@
+#ifndef PORTFOLIO_H
+#define PORTFOLIO_H
+
 #include <queue>
 #include <vector>
 #include <iostream>
@@ -12,11 +15,11 @@ class Portfolio {
 public:
     std::map<std::shared_ptr<Stock>, int> holdings; 
     std::mutex mtx;
-
-public:
     Portfolio();
     double portfolioValue();
     double makeChange(std::shared_ptr<Order> order, double cash);
     std::vector<std::shared_ptr<Stock>> listStocks();
     void cancelSell(std::shared_ptr<Order> order);
 };
+
+#endif

@@ -1,62 +1,52 @@
 #include "Stock.h"
 
-class Stock {
-public:
-    std::string name;
-    double price;
-    double factors = 1.0;
-    std::random_device rd;
-    std::mt19937 generator;
-    std::mutex mtx;
+Stock::Stock(std::string name, double price): name(name), price(price), rd(), generator(rd()) {}
 
-    Stock(std::string name, double price): name(name), price(price), rd(), generator(rd()) {}
+double Stock::getPrice(){
+    std::lock_guard<std::mutex> lock(mtx);
+    return factors*price;
+}
 
-    double getPrice(){
-        std::lock_guard<std::mutex> lock(mtx);
-        return factors*price;
-    }
+void Stock::updateFactors(double factor){
+    std::lock_guard<std::mutex> lock(mtx);
+    factors = factor;
+}
 
-    void updateFactors(double factor){
-        std::lock_guard<std::mutex> lock(mtx);
-        factors = factor;
-    }
-
-    void fluctuate(std::vector<double> fluctuations){
-        std::lock_guard<std::mutex> lock(mtx);
-        std::uniform_int_distribution<double> distribution(0.0, 1.0);
-        double stockCheck = distribution(generator);
-        double degreeCheck = distribution(generator);
-        bool pos = true;
-        if(stockCheck > (fluctuations[0]/3)){
-            if(0.5 > fluctuations[1]){
-                pos = false;
-            }
-            if(degreeCheck > fluctuations[2]){
-                editPrice((degreeCheck/12), pos);
-            }
-            else{
-                editPrice((degreeCheck/18), pos);
-            }
+void Stock::fluctuate(std::vector<double> fluctuations){
+    std::lock_guard<std::mutex> lock(mtx);
+    std::uniform_real_distribution<double> distribution(0.0, 1.0);
+    double stockCheck = distribution(generator);
+    double degreeCheck = distribution(generator);
+    bool pos = true;
+    if(stockCheck > (fluctuations[0]/3)){
+        if(0.5 > fluctuations[1]){
+            pos = false;
         }
-    }
-
-    void editPrice(double amount, bool dir){
-        std::lock_guard<std::mutex> lock(mtx);
-        if(dir){
-            price *= (1 + amount);
+        if(degreeCheck > fluctuations[2]){
+            editPrice((degreeCheck/12), pos);
         }
         else{
-            price *= (1 - amount);
+            editPrice((degreeCheck/18), pos);
         }
     }
+}
 
-    void econIndicators(double factors, double impact){
-        std::lock_guard<std::mutex> lock(mtx);
-        std::uniform_int_distribution<double> distribution(0.0, factors*2);
-        double econReport = distribution(generator);
-        double affectStock = 0.5;
-        if(econReport>affectStock){
-            updateFactors(factors*(impact+econReport));
-        }
+void Stock::editPrice(double amount, bool dir){
+    std::lock_guard<std::mutex> lock(mtx);
+    if(dir){
+        price *= (1 + amount);
     }
-};
+    else{
+        price *= (1 - amount);
+    }
+}
+
+void Stock::econIndicators(double factors, double impact){
+    std::lock_guard<std::mutex> lock(mtx);
+    std::uniform_real_distribution<double> distribution(0.0, factors*2);
+    double econReport = distribution(generator);
+    double affectStock = 0.5;
+    if(econReport>affectStock){
+        updateFactors(factors*(impact+econReport));
+    }
+}

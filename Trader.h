@@ -1,3 +1,6 @@
+#ifndef TRADER_H
+#define TRADER_H
+
 #include <queue>
 #include <vector>
 #include <iostream>
@@ -25,3 +28,5 @@ public:
     void cancelOrder(std::shared_ptr<Order> order);
     void doAction(std::vector<std::shared_ptr<Stock>> stocks);
 };
+
+#endif

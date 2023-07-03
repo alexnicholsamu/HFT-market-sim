@@ -1,3 +1,6 @@
+#ifndef ORDERBOOK_H
+#define ORDERBOOK_H
+
 #include <string>
 #include <vector>
 #include <map>
@@ -38,11 +41,11 @@ public:
     std::priority_queue<std::shared_ptr<Order>, std::vector<std::shared_ptr<Order>>, CompareOrder> buyOrders;
     std::priority_queue<std::shared_ptr<Order>, std::vector<std::shared_ptr<Order>>, CompareSellOrder> sellOrders;
     std::mutex mtx;
-    OrderBook() = default;
-
-public: 
+    OrderBook();
     void addOrder(std::shared_ptr<Order> order);
     std::vector<std::shared_ptr<Order>> executeTrades();
     bool cancelOrder(std::shared_ptr<Order> order);
     void clear();
 };
+
+#endif

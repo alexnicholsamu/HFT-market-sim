@@ -1,3 +1,6 @@
+#ifndef ORDER_H
+#define ORDER_H
+
 #include <string>
 #include <vector>
 #include <map>
@@ -23,3 +26,5 @@ public:
 
     Order(OrderType type, std::shared_ptr<Stock> stock, int quantity, int id, OrderPreference pref);
 };
+
+#endif 

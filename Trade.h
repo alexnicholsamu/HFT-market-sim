@@ -1,3 +1,6 @@
+#ifndef TRADE_H
+#define TRADE_H
+
 #include <queue>
 #include <vector>
 #include <iostream>
@@ -16,3 +19,5 @@ public:
 
     Trade(std::shared_ptr<Order> buyOrder, std::shared_ptr<Order> sellOrder);
 };
+
+#endif

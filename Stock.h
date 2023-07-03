@@ -1,3 +1,6 @@
+#ifndef STOCK_H
+#define STOCK_H
+
 #include <string>
 #include <vector>
 #include <map>
@@ -16,8 +19,6 @@ public:
     std::random_device rd;
     std::mt19937 generator;
     std::mutex mtx;
-
-public:
     Stock(std::string name, double price);
     double getPrice();
     void updateFactors(double factor);
@@ -25,3 +26,5 @@ public:
     void editPrice(double amount, bool dir);
     void econIndicators(double factors, double impact);
 };
+
+#endif
