@@ -1,8 +1,6 @@
 #ifndef ORDERBOOK_H
 #define ORDERBOOK_H
 
-
-#include "Order.h"
 #include "Trade.h"
 
 struct CompareSellOrder {

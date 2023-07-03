@@ -44,6 +44,7 @@ void Market::fluctuateMarket(){
     for (std::shared_ptr<Stock>& stock : stocks) { // directly apply fluctuations to stocks
         stock->fluctuate(marketFluctuations);
     }
+    std::cout << "Market Fluctuated!\n" << std::endl;
     std::chrono::seconds sleepDuration(2);
     std::this_thread::sleep_for(sleepDuration);
 }
@@ -53,6 +54,7 @@ void Market::applyMarketImpact(MarketEventType ME){
     std::vector<double> fluctuations;
     switch(ME){
         case MarketEventType::InterestRateChange: {
+            std::cout << "Market Event: Interest Rate Change!\n" << std::endl;
             std::uniform_real_distribution<double> interestDistribution(-4.0, 4.0);
             impact = interestDistribution(generator);
             interestRate += impact;
@@ -82,6 +84,7 @@ void Market::applyMarketImpact(MarketEventType ME){
             break;
         }
         case MarketEventType::GlobalEconomy: {
+            std::cout << "Market Event: Global Economy!\n" << std::endl;
             std::uniform_real_distribution<double> GEdistribution(0.0, 0.25);
             impact = GEdistribution(generator);
             if(factors < 1.0){
@@ -96,6 +99,7 @@ void Market::applyMarketImpact(MarketEventType ME){
             break;
         }
         case MarketEventType::EconomicIndicatorReports: {
+            std::cout << "Market Event: Economic Indicator Report!\n" << std::endl;
             std::uniform_real_distribution<double> EIRdistribution(0.25, 0.50);
             impact = EIRdistribution(generator);
             for (std::shared_ptr<Stock>& stock : stocks) { // directly apply fluctuations to stocks
@@ -104,6 +108,7 @@ void Market::applyMarketImpact(MarketEventType ME){
             break;
         }
         case MarketEventType::PublicOpinion: {
+            std::cout << "Market Event: Public Opinion!\n" << std::endl;
             std::uniform_real_distribution<double> lowdistribution(0.00, 0.60);
             std::uniform_real_distribution<double> highdistribution(0.40, 1.0);
             std::uniform_real_distribution<double> distribution(0.00, 1.0);
@@ -120,24 +125,27 @@ void Market::applyMarketImpact(MarketEventType ME){
                 fluctuations.push_back(high);
                 fluctuations.push_back(highlow * 0.4);
             }
-            for (std::shared_ptr<Stock>& stock : stocks) { // directly apply fluctuations to stocks
+            for (std::shared_ptr<Stock>& stock : stocks) {
                 stock->fluctuate(fluctuations);
             }
             break;
         }
         case MarketEventType::Recession: {
-            for (std::shared_ptr<Stock>& stock : stocks) { // directly apply fluctuations to stocks
+            std::cout << "Market Event: Recession!\n" << std::endl;
+            for (std::shared_ptr<Stock>& stock : stocks) { 
                 stock->updateFactors(factors*0.70);
             }
             break;
         }
         case MarketEventType::Prosperity: {
-            for (std::shared_ptr<Stock>& stock : stocks) { // directly apply fluctuations to stocks
+            std::cout << "Market Event: Prosperity!\n" << std::endl;
+            for (std::shared_ptr<Stock>& stock : stocks) { 
                 stock->updateFactors(factors*1.30);
             }
             break;
         }
         case MarketEventType::OtherGovPolicy: {
+            std::cout << "Market Event: Other Government Policty!\n";
             std::uniform_real_distribution<double> GEdistribution(0.0, 0.25);
             impact = GEdistribution(generator);
             if(factors < 1.0){
@@ -146,12 +154,13 @@ void Market::applyMarketImpact(MarketEventType ME){
             else{
                     factors *= (1-impact);
             }
-            for (std::shared_ptr<Stock>& stock : stocks) { // directly apply fluctuations to stocks
+            for (std::shared_ptr<Stock>& stock : stocks) { 
                 stock->updateFactors(factors);
             }
             break;
         }
         case MarketEventType::Nothing:
+            std::cout << "Market Event: Nothing!\n";
             break;
     }
 }
@@ -170,15 +179,11 @@ std::map<double,MarketEventType> Market::generateMarketEventChances(){
 }
 
 void Market::run(){
-    std::cout << "Checkpoint 1.5";
     std::atomic<bool> running(true);
     initializeTraders("traders.txt");
     initializeStocks("stocks.txt");
     std::map<double,MarketEventType> marketEventChance = generateMarketEventChances();
-    std::cout << "Checkpoint 1.75";
     std::vector<std::thread> threads;
-
-    std::cout << "Checkpoint 2";
 
     auto start = std::chrono::steady_clock::now();
 

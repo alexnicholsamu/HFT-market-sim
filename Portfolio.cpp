@@ -6,8 +6,8 @@ double Portfolio::portfolioValue(){
     double totvalue = 0;
     for(const auto& pair : holdings) {
         int quantity = pair.second;
-        std::shared_ptr<Stock> stock = pair.first;  // changed to pointer
-        totvalue += quantity * stock->getPrice();  // use -> instead of .
+        std::shared_ptr<Stock> stock = pair.first;  
+        totvalue += quantity * stock->getPrice();  
     }
     return totvalue;
 }
@@ -34,8 +34,8 @@ void Portfolio::cancelSell(std::shared_ptr<Order> order){
 std::vector<std::shared_ptr<Stock>> Portfolio::listStocks(){
     std::vector<std::shared_ptr<Stock>> listComps;
     for(const auto& pair : holdings) {
-        std::shared_ptr<Stock> stock = pair.first;  // changed to pointer
-        listComps.push_back(stock);  // use -> instead of .
+        std::shared_ptr<Stock> stock = pair.first;  
+        listComps.push_back(stock);  
     }
     return listComps;
 }

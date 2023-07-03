@@ -1,8 +1,6 @@
 #ifndef MARKET_H
 #define MARKET_H
 
-
-
 #include "Trader.h"
 
 enum class MarketEventType { InterestRateChange, GlobalEconomy, EconomicIndicatorReports, 

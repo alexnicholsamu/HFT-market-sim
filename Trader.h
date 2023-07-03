@@ -2,9 +2,7 @@
 #define TRADER_H
 
 #include "Portfolio.h"
-#include "Trade.h"
 #include "OrderBook.h"
-#include "Order.h"
 
 class Trader{
 public:

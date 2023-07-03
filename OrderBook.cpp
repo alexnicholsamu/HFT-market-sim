@@ -11,6 +11,7 @@ void OrderBook::addOrder(std::shared_ptr<Order> order) {
         case OrderType::Sell:
             sellOrders.push(order);
     }
+    std::cout << "Order Placed!\n" << std::endl;
 }
 
 std::vector<std::shared_ptr<Order>> OrderBook::executeTrades() {
@@ -56,6 +57,7 @@ std::vector<std::shared_ptr<Order>> OrderBook::executeTrades() {
             break;
         }
     }
+    std::cout << "OrderBook executed!" << std::endl;
     return orders;
 }
 
@@ -74,9 +76,6 @@ bool OrderBook::cancelOrder(std::shared_ptr<Order> order){
                 tempQueue.push(currentEntry);
             }
         }
-        if(!hadEntry){
-            std::cout << "Error: Orderbook did not contain Order!";
-        }
         buyOrders = tempQueue;
         return hadEntry;
     }
@@ -94,9 +93,6 @@ bool OrderBook::cancelOrder(std::shared_ptr<Order> order){
             else{
                 tempQueue.push(currentEntry);
             }
-        }
-        if(!hadEntry){
-            std::cout << "Error: Orderbook did not contain Order!";
         }
         sellOrders = tempQueue;
         return hadEntry;

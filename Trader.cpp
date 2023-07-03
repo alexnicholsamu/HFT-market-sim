@@ -6,47 +6,33 @@ Trader::Trader(int id, double available_cash, std::shared_ptr<OrderBook> orderbo
 
 void Trader::makeOrder(OrderType type, std::shared_ptr<Stock> stock, int quantity, OrderPreference pref){
     std::shared_ptr<Order> order = std::make_shared<Order>(type, stock, quantity, id, pref);
-    double order_price = order->order_price;  // use the price at the time of order creation
+    double order_price = order->order_price; 
     if(order->type == OrderType::Buy){
         double moneychange = order_price * quantity;
-        if(moneychange <= available_cash){
-            available_cash -= moneychange;
-            active_orders.push_back(order);
-            orderbook->addOrder(order);
-        }
-        else{
-            std::cout << "Insufficient funds available. Funds needed for order: " 
-                << moneychange << " Available funds: " << available_cash << "\n";
-        }
+        available_cash -= moneychange;
+        active_orders.push_back(order);
+        orderbook->addOrder(order);
     }
     else{
-        if (portfolio.holdings.find(stock) == portfolio.holdings.end()) { 
-            std::cout << "Error: Stock not in portfolio!\n";
-            return;
-        } 
-        else {
-            if(portfolio.holdings[stock] < quantity){
-                std::cout << "Warning: Only have " << portfolio.holdings[stock] << " shares of " << stock->name <<
-                ". Instead, selling all available shares \n";
-                quantity = portfolio.holdings[stock];
-            }
-            portfolio.holdings[stock] -= quantity;
-            if(portfolio.holdings[stock]==0){
-                portfolio.holdings.erase(stock);
-            }
-            active_orders.push_back(order);
-            orderbook->addOrder(order);
+        portfolio.holdings[stock] -= quantity;
+        if(portfolio.holdings[stock]==0){
+            portfolio.holdings.erase(stock);
         }
+        active_orders.push_back(order);
+        orderbook->addOrder(order);
     }
 }
+
 
 void Trader::cancelOrder(std::shared_ptr<Order> order){
     bool cancel = orderbook->cancelOrder(order);
     if(cancel && order->type == OrderType::Buy){
-        available_cash += order->order_price * order->quantity;  // use the price at the time of order creation
+        available_cash += order->order_price * order->quantity;
+        std::cout << "Order Canceled!\n" << std::endl; 
     }
     if(cancel && order->type == OrderType::Sell){
         portfolio.cancelSell(order);
+        std::cout << "Order Canceled!\n" << std::endl; 
     }
 }
 
@@ -60,7 +46,7 @@ void Trader::doAction(std::vector<std::shared_ptr<Stock>> stocks){
     double action = distribution(generator);
     std::uniform_int_distribution<int> stockBuyDistribution(0, stocks.size()-1);
     std::shared_ptr<Stock> chosenStock;
-    std::uniform_int_distribution<int> quantDistribution(1, portfolio.holdings[chosenStock]);
+    std::uniform_int_distribution<int> quantSellDistribution(1, portfolio.holdings[chosenStock]);
     OrderPreference type;
     OrderType Otype;
     std::uniform_int_distribution<int> stockSellDistribution(0, portfolio_size-1);
@@ -87,7 +73,7 @@ void Trader::doAction(std::vector<std::shared_ptr<Stock>> stocks){
         if(portfolio_size>0){
             choice = stockSellDistribution(generator);
             chosenStock = portfolio.listStocks()[choice];
-            quantitySell = quantDistribution(generator);
+            quantitySell = quantSellDistribution(generator);
             if(typeAction < 0.5){
                 type = OrderPreference::Limit;
             }
