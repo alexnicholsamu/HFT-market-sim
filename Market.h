@@ -11,7 +11,6 @@ public:
     std::random_device rd;
     std::mt19937 generator;
     std::vector<std::shared_ptr<Trader>> traders;
-    std::mutex mtx;
     double interestRate = 1.0;
     double factors = 1.0;
     std::shared_ptr<OrderBook> orderbook;

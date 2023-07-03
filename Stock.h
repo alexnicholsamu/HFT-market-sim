@@ -27,7 +27,11 @@ public:
     double factors = 1.0;
     std::random_device rd;
     std::mt19937 generator;
-    std::mutex mtx;
+    std::mutex fluctmtx;
+    std::mutex econmtx;
+    std::mutex pricemtx;
+    std::mutex getpmtx;
+    std::mutex upfacmtx;
     Stock(std::string name, double price);
     double getPrice();
     void updateFactors(double factor);

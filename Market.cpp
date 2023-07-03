@@ -19,7 +19,8 @@ void Market::executeOrderBook(){
 }
 
 void Market::generateMarketEvent(std::map<double, MarketEventType> MEcreation){
-    std::lock_guard<std::mutex> lock(mtx);
+    std::chrono::seconds sleepDuration(10);
+    std::this_thread::sleep_for(sleepDuration);
     std::uniform_real_distribution<double> distribution(0.0, 1.0);
     double marketEvent = distribution(generator);
     for(auto& pair : MEcreation){
@@ -28,8 +29,7 @@ void Market::generateMarketEvent(std::map<double, MarketEventType> MEcreation){
             break;
         }
     }
-    std::chrono::seconds sleepDuration(10);
-    std::this_thread::sleep_for(sleepDuration);
+    
 }
 
 void Market::fluctuateMarket(){
@@ -212,7 +212,7 @@ void Market::run(){
 
     std::thread orderbookThread([this, &start, &running] {
         while (running) {
-            orderbook->executeTrades();
+            executeOrderBook();
             auto now = std::chrono::steady_clock::now();
             if (std::chrono::duration_cast<std::chrono::seconds>(now - start).count() >= 300) {
                 running = false;
