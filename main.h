@@ -15,6 +15,17 @@
 #include <iostream>
 #include <map>
 
+class Market;
+class OrderBook;
+enum class MarketEventType;
+enum class OrderPreference;
+enum class OrderType;
+class Trader;
+class Trade;
+class Order;
+class Portfolio;
+class Stock;
+
 int main();
 
 #endif

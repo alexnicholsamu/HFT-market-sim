@@ -1,6 +1,6 @@
 #include "Market.h"
 
-Market::Market(): rd(), generator(rd()) {}
+Market::Market() {}
 
 void Market::executeOrderBook(){
     std::vector<std::shared_ptr<Order>> orders = orderbook->executeTrades();

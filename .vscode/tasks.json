@@ -28,8 +28,7 @@
             "type": "shell",
             "command": "./shellrun.sh",
             "problemMatcher": []
-        }
-                
+        },
     ],
     "version": "2.0.0"
 }
