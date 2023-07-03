@@ -176,6 +176,8 @@ void Market::run(){
     std::map<double,MarketEventType> marketEventChance = generateMarketEventChances();
     std::vector<std::thread> threads;
 
+    std::cout << "Checkpoint 2";
+
     auto start = std::chrono::steady_clock::now();
 
     std::thread METhread([this, &start, &running, marketEventChance] {
