@@ -15,21 +15,23 @@ public:
 
     void executeOrderBook(){
         std::vector<std::shared_ptr<Order>> orders = orderbook->executeTrades();
-        std::shared_ptr<Order> buyOrder = orders[0];
-        std::shared_ptr<Order> sellOrder = orders[1];
-        for(Trader& trader : traders){
-            if(trader.id == buyOrder->id){
-                trader.updatePortfolio(buyOrder);
-            }
-            if(trader.id == sellOrder->id){
-                trader.updatePortfolio(sellOrder);
+        if(!orders.empty()){
+            std::shared_ptr<Order> buyOrder = orders[0];
+            std::shared_ptr<Order> sellOrder = orders[1];
+            for(Trader& trader : traders){
+                if(trader.id == buyOrder->id){
+                    trader.updatePortfolio(buyOrder);
+                }
+                if(trader.id == sellOrder->id){
+                    trader.updatePortfolio(sellOrder);
+                }
             }
         }
     }
 
     void generateMarketEvent(std::map<double, MarketEventType> MEcreation){
         std::lock_guard<std::mutex> lock(mtx);
-        std::uniform_int_distribution<double> distribution(0.0, 1.0);
+        std::uniform_real_distribution<double> distribution(0.0, 1.0);
         double marketEvent = distribution(generator);
         for(auto& pair : MEcreation){
             if (marketEvent <= pair.first) {
@@ -37,12 +39,12 @@ public:
                 break;
             }
         }
-        std::chrono::seconds sleepDuration(40);
+        std::chrono::seconds sleepDuration(10);
         std::this_thread::sleep_for(sleepDuration);
     }
 
     void fluctuateMarket(){
-        std::uniform_int_distribution<double> distribution(0.0, 1.0);
+        std::uniform_real_distribution<double> distribution(0.0, 1.0);
         double chooseStocks = distribution(generator);
         double chooseDirection = distribution(generator);
         double chooseDegree = distribution(generator);
@@ -62,7 +64,7 @@ public:
         std::vector<double> fluctuations;
         switch(ME){
             case MarketEventType::InterestRateChange:
-                std::uniform_int_distribution<double> interestDistribution(-4.0, 4.0);
+                std::uniform_real_distribution<double> interestDistribution(-4.0, 4.0);
                 impact = interestDistribution(generator);
                 interestRate += impact;
                 if(interestRate < 0.01){
@@ -90,7 +92,7 @@ public:
                 }
                 break;
             case MarketEventType::GlobalEconomy:
-                std::uniform_int_distribution<double> GEdistribution(0.0, 0.25);
+                std::uniform_real_distribution<double> GEdistribution(0.0, 0.25);
                 impact = GEdistribution(generator);
                 if(factors < 1.0){
                     factors *= (1-impact);
@@ -103,16 +105,16 @@ public:
                 }
                 break;
             case MarketEventType::EconomicIndicatorReports:
-                std::uniform_int_distribution<double> EIRdistribution(0.25, 0.50);
+                std::uniform_real_distribution<double> EIRdistribution(0.25, 0.50);
                 impact = EIRdistribution(generator);
                 for (std::shared_ptr<Stock>& stock : stocks) { // directly apply fluctuations to stocks
                     stock->econIndicators(factors, impact);
                 }
                 break;
             case MarketEventType::PublicOpinion:
-                std::uniform_int_distribution<double> lowdistribution(0.00, 0.60);
-                std::uniform_int_distribution<double> highdistribution(0.40, 1.0);
-                std::uniform_int_distribution<double> distribution(0.00, 1.0);
+                std::uniform_real_distribution<double> lowdistribution(0.00, 0.60);
+                std::uniform_real_distribution<double> highdistribution(0.40, 1.0);
+                std::uniform_real_distribution<double> distribution(0.00, 1.0);
                 double highlow = distribution(generator);
                 double high = highdistribution(generator);
                 double low = lowdistribution(generator);
@@ -158,14 +160,86 @@ public:
         }
     }
 
-    void run(){
-        bool running = true;
-        initializeTraders("traders.txt", traders);
-        initializeStocks("stocks.txt", stocks);
-        while(running){
-            
-        }
+    std::map<double,MarketEventType> generateMarketEventChances(){
+        std::map<double,MarketEventType> marketEventChance;
+        marketEventChance[0.05] = MarketEventType::Prosperity;
+        marketEventChance[0.10] = MarketEventType::Recession;
+        marketEventChance[0.20] = MarketEventType::EconomicIndicatorReports;
+        marketEventChance[0.30] = MarketEventType::GlobalEconomy;
+        marketEventChance[0.40] = MarketEventType::InterestRateChange;
+        marketEventChance[0.50] = MarketEventType::OtherGovPolicy;
+        marketEventChance[0.60] = MarketEventType::PublicOpinion;
+        marketEventChance[1.0] = MarketEventType::Nothing;
+        return marketEventChance;
     }
+
+    void run(){
+        std::atomic<bool> running(true);
+        initializeTraders("traders.txt");
+        initializeStocks("stocks.txt");
+        std::map<double,MarketEventType> marketEventChance = generateMarketEventChances();
+        std::vector<std::thread> threads;
+
+        auto start = std::chrono::steady_clock::now();
+
+        std::thread METhread([this, &start, &running, marketEventChance] {
+            while (running) {
+                generateMarketEvent(marketEventChance);
+                auto now = std::chrono::steady_clock::now();
+                if (std::chrono::duration_cast<std::chrono::seconds>(now - start).count() >= 300) {
+                    running = false;
+                }
+            }
+        });
+
+        std::thread fluctuateThread([this, &start, &running] {
+            while (running) {
+                fluctuateMarket();
+                auto now = std::chrono::steady_clock::now();
+                if (std::chrono::duration_cast<std::chrono::seconds>(now - start).count() >= 300) {
+                    running = false;
+                }
+            }
+        });
+
+        std::thread orderbookThread([this, &start, &running] {
+            while (running) {
+                orderbook->executeTrades();
+                auto now = std::chrono::steady_clock::now();
+                if (std::chrono::duration_cast<std::chrono::seconds>(now - start).count() >= 300) {
+                    running = false;
+                }
+            }
+        });
+
+        threads.push_back(std::move(METhread));
+        threads.push_back(std::move(fluctuateThread));
+        threads.push_back(std::move(orderbookThread));
+
+        for (Trader& trader : traders) {
+            std::thread traderThread([this, &start, &running, &trader] {
+                while (running) {
+                    trader.doAction(stocks);
+                    auto now = std::chrono::steady_clock::now();
+                    if (std::chrono::duration_cast<std::chrono::seconds>(now - start).count() >= 300) {
+                        running = false;
+                    }
+                }
+            });
+            threads.push_back(std::move(traderThread));
+        }
+
+        for (std::thread& thread : threads) {
+            if (thread.joinable()) {
+                thread.join();
+            }
+        }
+
+        reset();
+        std::cout << "Simulation Ended!";
+        return;
+    }
+
 
     void reset(){
         traders.clear();
@@ -173,7 +247,7 @@ public:
         orderbook->clear();
     }
 
-    void initializeTraders(std::string filename, std::vector<Trader>& traders) {
+    void initializeTraders(std::string filename) {
         std::ifstream file(filename);
         int id;
         double cash;
@@ -183,7 +257,7 @@ public:
         file.close();
     }
 
-    void initializeStocks(std::string filename, std::vector<std::shared_ptr<Stock>>& stocks) {
+    void initializeStocks(std::string filename) {
         std::ifstream file(filename);
         std::string name;
         double price;

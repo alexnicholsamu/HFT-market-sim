@@ -41,6 +41,7 @@ public:
     }
 
     void editPrice(double amount, bool dir){
+        std::lock_guard<std::mutex> lock(mtx);
         if(dir){
             price *= (1 + amount);
         }
@@ -50,6 +51,7 @@ public:
     }
 
     void econIndicators(double factors, double impact){
+        std::lock_guard<std::mutex> lock(mtx);
         std::uniform_int_distribution<double> distribution(0.0, factors*2);
         double econReport = distribution(generator);
         double affectStock = 0.5;

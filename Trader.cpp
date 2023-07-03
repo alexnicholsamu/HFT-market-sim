@@ -111,5 +111,7 @@ public:
             choice = orderCancelDistribution(generator);
             orderbook->cancelOrder(active_orders[choice]);
         }
+        std::chrono::seconds sleepDuration(1);
+        std::this_thread::sleep_for(sleepDuration);
     }
 };

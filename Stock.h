@@ -6,6 +6,7 @@
 #include <cmath>
 #include <random>
 #include <variant>
+#include <atomic>
 
 class Stock{
 public:

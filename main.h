@@ -1,5 +1,4 @@
 #include "Portfolio.h"
-#include "MarketEvent.h"
 #include "Order.h"
 #include "Trade.h"
 #include "OrderBook.h"

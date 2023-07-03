@@ -6,6 +6,7 @@
 #include <chrono>
 #include <thread>
 #include <fstream>
+#include <atomic>
 
 #include "Trader.h"
 #include "OrderBook.h"
@@ -26,8 +27,9 @@ public:
     void executeOrderBook();
     void generateMarketEvent(std::map<double, MarketEventType> MEcreation);
     void applyMarketImpact(MarketEventType ME);
-    void addStock(std::string name, double initialPrice);
-    void addTrader();
+    void initializeStocks(std::string filename);
+    void initializeTraders(std::string filename);
+    std::map<double,MarketEventType> generateMarketEventChances();
     void reset();
     void run();
 };

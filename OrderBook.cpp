@@ -19,6 +19,7 @@ public:
 
     std::vector<std::shared_ptr<Order>> executeTrades() {
         std::lock_guard<std::mutex> lock(mtx);
+        std::vector<std::shared_ptr<Order>> orders;
         while(!buyOrders.empty() && !sellOrders.empty()) {
             std::shared_ptr<Order> buyOrder = buyOrders.top();
             std::shared_ptr<Order> sellOrder = sellOrders.top();
@@ -50,7 +51,7 @@ public:
                 else {
                     sellOrder->status = OrderStatus::Partial;
                 }
-                std::vector<std::shared_ptr<Order>> orders;
+                
                 orders.push_back(buyOrder);
                 orders.push_back(sellOrder);
                 return orders;
@@ -59,6 +60,7 @@ public:
                 break;
             }
         }
+        return orders;
     }
 
     bool cancelOrder(std::shared_ptr<Order> order){
