@@ -8,6 +8,7 @@ void Trader::makeOrder(OrderType type, std::shared_ptr<Stock> stock, int quantit
     std::shared_ptr<Order> order = std::make_shared<Order>(type, stock, quantity, id, pref, mtx);
     double order_price = order->order_price; 
     if(order->type == OrderType::Buy){
+        std::cout << "Trader action checkpoint 3.1" << std::endl;
         double moneychange = order_price * quantity;
         available_cash -= moneychange;
         active_orders.push_back(order);
@@ -18,6 +19,7 @@ void Trader::makeOrder(OrderType type, std::shared_ptr<Stock> stock, int quantit
         if(portfolio.holdings[stock]==0){
             portfolio.holdings.erase(stock);
         }
+        std::cout << "Trader action checkpoint 3.2" << std::endl;
         active_orders.push_back(order);
         orderbook->addOrder(order, mtx);
     }
@@ -37,6 +39,7 @@ void Trader::cancelOrder(std::shared_ptr<Order> order, std::mutex& mtx){
 }
 
 void Trader::updatePortfolio(std::shared_ptr<Order> order, std::mutex& mtx){
+    std::cout << "exec Order Book checkpoint 5" << std::endl;
     available_cash = portfolio.makeChange(order, available_cash, mtx);
 }
 
@@ -46,21 +49,20 @@ void Trader::doAction(std::vector<std::shared_ptr<Stock>> stocks, std::mutex& mt
     double action = distribution(generator);
     std::uniform_int_distribution<int> stockBuyDistribution(0, stocks.size()-1);
     std::shared_ptr<Stock> chosenStock;
-    std::uniform_int_distribution<int> quantSellDistribution(1, portfolio.holdings[chosenStock]);
     OrderPreference type;
     OrderType Otype;
-    std::uniform_int_distribution<int> stockSellDistribution(0, portfolio_size-1);
-    std::uniform_int_distribution<int> orderCancelDistribution(0, active_orders.size()-1);
     int quantityBuy;
-    int typeAction = distribution(generator);
+    double typeAction = distribution(generator);
     int quantitySell;
     int choice;
     int order_size = active_orders.size();
-    if(action < 0.475){
+    std::cout << "Trader action checkpoint 1" << std::endl;
+    if(action < 0.475 ){
         choice = stockBuyDistribution(generator);
         chosenStock = stocks[choice];
         std::uniform_int_distribution<int> quantBuyDistribution(0,(int)floor(available_cash/chosenStock->getPrice(mtx)));
         quantityBuy = quantBuyDistribution(generator);
+        std::cout << "Trader action checkpoint 2.1" << std::endl;
         if(typeAction < 0.5){
             type = OrderPreference::Limit;
         }
@@ -69,11 +71,14 @@ void Trader::doAction(std::vector<std::shared_ptr<Stock>> stocks, std::mutex& mt
         }
         makeOrder(OrderType::Buy, chosenStock, quantityBuy, type, mtx);
     }
-    if(action < 0.95){
+    else if(action < 0.95){
         if(portfolio_size>0){
+            std::uniform_int_distribution<int> stockSellDistribution(0, portfolio_size-1);
             choice = stockSellDistribution(generator);
             chosenStock = portfolio.listStocks(mtx)[choice];
+            std::uniform_int_distribution<int> quantSellDistribution(1, portfolio.holdings[chosenStock]);
             quantitySell = quantSellDistribution(generator);
+            std::cout << "Trader action checkpoint 2.2" << std::endl;
             if(typeAction < 0.5){
                 type = OrderPreference::Limit;
             }
@@ -84,8 +89,12 @@ void Trader::doAction(std::vector<std::shared_ptr<Stock>> stocks, std::mutex& mt
         }
     }
     else{
+        std::uniform_int_distribution<int> orderCancelDistribution(0, active_orders.size()-1);
         choice = orderCancelDistribution(generator);
-        cancelOrder(active_orders[choice], mtx);
+        std::cout << "Trader action checkpoint 2.3" << std::endl;
+        if(!active_orders.size() == 0){
+            cancelOrder(active_orders[choice], mtx);
+        }
     }
     std::chrono::seconds sleepDuration(1);
     std::this_thread::sleep_for(sleepDuration);

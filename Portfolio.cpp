@@ -4,6 +4,7 @@ Portfolio::Portfolio()  {}
 
 double Portfolio::makeChange(std::shared_ptr<Order> order, double cash, std::mutex& mtx){
     std::lock_guard<std::mutex> lock(mtx);
+    std::cout << "exec Order Book checkpoint 6" << std::endl;
     if(order->type == OrderType::Buy){
         holdings[order->stock] += order->quantity;
     }

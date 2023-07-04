@@ -3,7 +3,11 @@
 Market::Market(): rd(), generator(rd()) {}
 
 void Market::executeOrderBook(std::mutex& mtx){
+    std::chrono::seconds sleepDuration(3);
+    std::this_thread::sleep_for(sleepDuration);
+    std::cout << "exec Order Book checkpoint 1" << std::endl;
     std::vector<std::shared_ptr<Order>> orders = orderbook->executeTrades(mtx);
+    std::cout << "exec Order Book checkpoint 4" << std::endl;
     if(!orders.empty()){
         std::shared_ptr<Order> buyOrder = orders[0];
         std::shared_ptr<Order> sellOrder = orders[1];
@@ -33,10 +37,12 @@ void Market::generateMarketEvent(std::map<double, MarketEventType> MEcreation, s
 }
 
 void Market::fluctuateMarket(std::mutex& mtx){
+    std::cout << "Market Fluctuation!" << std::endl;
     std::uniform_real_distribution<double> distribution(0.0, 1.0);
     double chooseStocks = distribution(generator);
     double chooseDirection = distribution(generator);
     double chooseDegree = distribution(generator);
+    std::cout << "fluctuate checkpoint 1" << std::endl;
     std::vector<double> marketFluctuations;
     marketFluctuations.push_back(chooseStocks);
     marketFluctuations.push_back(chooseDirection);
@@ -44,7 +50,6 @@ void Market::fluctuateMarket(std::mutex& mtx){
     for (std::shared_ptr<Stock>& stock : stocks) { // directly apply fluctuations to stocks
         stock->fluctuate(marketFluctuations, mtx);
     }
-    std::cout << "Market Fluctuated!\n" << std::endl;
     std::chrono::seconds sleepDuration(2);
     std::this_thread::sleep_for(sleepDuration);
 }

@@ -17,6 +17,7 @@ void Stock::fluctuate(std::vector<double> fluctuations, std::mutex& mtx){
     std::uniform_real_distribution<double> distribution(0.0, 1.0);
     double stockCheck = distribution(generator);
     double degreeCheck = distribution(generator);
+    std::cout << "fluctuation checkpoint 2" << std::endl;
     bool pos = true;
     if(stockCheck > (fluctuations[0]/3)){
         if(0.5 > fluctuations[1]){
@@ -29,6 +30,7 @@ void Stock::fluctuate(std::vector<double> fluctuations, std::mutex& mtx){
             editPrice((degreeCheck/18), pos, mtx);
         }
     }
+    std::cout << "Market Fluctuated!" << std::endl;
 }
 
 void Stock::editPrice(double amount, bool dir, std::mutex& mtx){
