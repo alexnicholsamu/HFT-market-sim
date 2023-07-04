@@ -6,12 +6,11 @@
 class Portfolio {
 public:
     std::map<std::shared_ptr<Stock>, int> holdings; 
-    std::mutex mtx;
     Portfolio();
     double portfolioValue();
-    double makeChange(std::shared_ptr<Order> order, double cash);
+    double makeChange(std::shared_ptr<Order> order, double cash, std::mutex& mtx);
     std::vector<std::shared_ptr<Stock>> listStocks();
-    void cancelSell(std::shared_ptr<Order> order);
+    void cancelSell(std::shared_ptr<Order> order, std::mutex& mtx);
 };
 
 #endif

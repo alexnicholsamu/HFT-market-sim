@@ -12,7 +12,7 @@ double Portfolio::portfolioValue(){
     return totvalue;
 }
 
-double Portfolio::makeChange(std::shared_ptr<Order> order, double cash){
+double Portfolio::makeChange(std::shared_ptr<Order> order, double cash, std::mutex& mtx){
     std::lock_guard<std::mutex> lock(mtx);
     if(order->type == OrderType::Buy){
         holdings[order->stock] += order->quantity;
@@ -27,7 +27,8 @@ double Portfolio::makeChange(std::shared_ptr<Order> order, double cash){
     return cash;
 }
 
-void Portfolio::cancelSell(std::shared_ptr<Order> order){
+void Portfolio::cancelSell(std::shared_ptr<Order> order, std::mutex& mtx){
+    std::lock_guard<std::mutex> guard(mtx);
     holdings[order->stock] += order->quantity;
 }
 
