@@ -4,7 +4,6 @@
 OrderBook::OrderBook() {} 
 
 void OrderBook::addOrder(std::shared_ptr<Order> order) {
-    std::lock_guard<std::mutex> lock(ordmtx);
     switch (order->type){
         case OrderType::Buy:
             buyOrders.push(order);
@@ -15,7 +14,6 @@ void OrderBook::addOrder(std::shared_ptr<Order> order) {
 }
 
 std::vector<std::shared_ptr<Order>> OrderBook::executeTrades() {
-    std::lock_guard<std::mutex> lock(execmtx);
     std::vector<std::shared_ptr<Order>> orders;
     while(!buyOrders.empty() && !sellOrders.empty()) {
         std::shared_ptr<Order> buyOrder = buyOrders.top();
@@ -62,7 +60,6 @@ std::vector<std::shared_ptr<Order>> OrderBook::executeTrades() {
 }
 
 bool OrderBook::cancelOrder(std::shared_ptr<Order> order){
-    std::lock_guard<std::mutex> lock(cancmtx);
     if(order->type == OrderType::Buy){
         std::priority_queue<std::shared_ptr<Order>, std::vector<std::shared_ptr<Order>>, CompareOrder> tempQueue;
         bool hadEntry = false;

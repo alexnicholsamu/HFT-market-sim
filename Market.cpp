@@ -54,7 +54,7 @@ void Market::applyMarketImpact(MarketEventType ME){
     std::vector<double> fluctuations;
     switch(ME){
         case MarketEventType::InterestRateChange: {
-            std::cout << "Market Event: Interest Rate Change!\n" << std::endl;
+            std::cout << "Market Event: Interest Rate Change!" << std::endl;
             std::uniform_real_distribution<double> interestDistribution(-4.0, 4.0);
             impact = interestDistribution(generator);
             interestRate += impact;
@@ -84,7 +84,7 @@ void Market::applyMarketImpact(MarketEventType ME){
             break;
         }
         case MarketEventType::GlobalEconomy: {
-            std::cout << "Market Event: Global Economy!\n" << std::endl;
+            std::cout << "Market Event: Global Economy!" << std::endl;
             std::uniform_real_distribution<double> GEdistribution(0.0, 0.25);
             impact = GEdistribution(generator);
             if(factors < 1.0){
@@ -99,7 +99,7 @@ void Market::applyMarketImpact(MarketEventType ME){
             break;
         }
         case MarketEventType::EconomicIndicatorReports: {
-            std::cout << "Market Event: Economic Indicator Report!\n" << std::endl;
+            std::cout << "Market Event: Economic Indicator Report!" << std::endl;
             std::uniform_real_distribution<double> EIRdistribution(0.25, 0.50);
             impact = EIRdistribution(generator);
             for (std::shared_ptr<Stock>& stock : stocks) { // directly apply fluctuations to stocks
@@ -108,7 +108,7 @@ void Market::applyMarketImpact(MarketEventType ME){
             break;
         }
         case MarketEventType::PublicOpinion: {
-            std::cout << "Market Event: Public Opinion!\n" << std::endl;
+            std::cout << "Market Event: Public Opinion!" << std::endl;
             std::uniform_real_distribution<double> lowdistribution(0.00, 0.60);
             std::uniform_real_distribution<double> highdistribution(0.40, 1.0);
             std::uniform_real_distribution<double> distribution(0.00, 1.0);
@@ -131,21 +131,21 @@ void Market::applyMarketImpact(MarketEventType ME){
             break;
         }
         case MarketEventType::Recession: {
-            std::cout << "Market Event: Recession!\n" << std::endl;
+            std::cout << "Market Event: Recession!" << std::endl;
             for (std::shared_ptr<Stock>& stock : stocks) { 
                 stock->updateFactors(factors*0.70);
             }
             break;
         }
         case MarketEventType::Prosperity: {
-            std::cout << "Market Event: Prosperity!\n" << std::endl;
+            std::cout << "Market Event: Prosperity!" << std::endl;
             for (std::shared_ptr<Stock>& stock : stocks) { 
                 stock->updateFactors(factors*1.30);
             }
             break;
         }
         case MarketEventType::OtherGovPolicy: {
-            std::cout << "Market Event: Other Government Policty!\n";
+            std::cout << "Market Event: Other Government Policty!" << std::endl;
             std::uniform_real_distribution<double> GEdistribution(0.0, 0.25);
             impact = GEdistribution(generator);
             if(factors < 1.0){
@@ -160,7 +160,7 @@ void Market::applyMarketImpact(MarketEventType ME){
             break;
         }
         case MarketEventType::Nothing:
-            std::cout << "Market Event: Nothing!\n";
+            std::cout << "Market Event: Nothing!" << std::endl;
             break;
     }
 }
@@ -244,7 +244,7 @@ void Market::run(){
     }
 
     reset();
-    std::cout << "Simulation Ended!";
+    std::cout << "Simulation Ended!" << std::endl;
     return;
 }
 
