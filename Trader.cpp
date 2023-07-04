@@ -5,7 +5,7 @@ Trader::Trader(int id, double available_cash, std::shared_ptr<OrderBook> orderbo
 
 
 void Trader::makeOrder(OrderType type, std::shared_ptr<Stock> stock, int quantity, OrderPreference pref, std::mutex& mtx){
-    std::shared_ptr<Order> order = std::make_shared<Order>(type, stock, quantity, id, pref);
+    std::shared_ptr<Order> order = std::make_shared<Order>(type, stock, quantity, id, pref, mtx);
     double order_price = order->order_price; 
     if(order->type == OrderType::Buy){
         double moneychange = order_price * quantity;
@@ -59,7 +59,7 @@ void Trader::doAction(std::vector<std::shared_ptr<Stock>> stocks, std::mutex& mt
     if(action < 0.475){
         choice = stockBuyDistribution(generator);
         chosenStock = stocks[choice];
-        std::uniform_int_distribution<int> quantBuyDistribution(0,(int)floor(available_cash/chosenStock->getPrice()));
+        std::uniform_int_distribution<int> quantBuyDistribution(0,(int)floor(available_cash/chosenStock->getPrice(mtx)));
         quantityBuy = quantBuyDistribution(generator);
         if(typeAction < 0.5){
             type = OrderPreference::Limit;
@@ -72,7 +72,7 @@ void Trader::doAction(std::vector<std::shared_ptr<Stock>> stocks, std::mutex& mt
     if(action < 0.95){
         if(portfolio_size>0){
             choice = stockSellDistribution(generator);
-            chosenStock = portfolio.listStocks()[choice];
+            chosenStock = portfolio.listStocks(mtx)[choice];
             quantitySell = quantSellDistribution(generator);
             if(typeAction < 0.5){
                 type = OrderPreference::Limit;
