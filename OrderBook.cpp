@@ -63,9 +63,9 @@ std::vector<std::shared_ptr<Order>> OrderBook::executeTrades(std::mutex& mtx) {
 
 bool OrderBook::cancelOrder(std::shared_ptr<Order> order, std::mutex& mtx){
     std::lock_guard<std::mutex> guard(mtx);
+    std::atomic<bool> hadEntry = false;
     if(order->type == OrderType::Buy){
         std::priority_queue<std::shared_ptr<Order>, std::vector<std::shared_ptr<Order>>, CompareOrder> tempQueue;
-        bool hadEntry = false;
         std::cout << "Trader action checkpoint 3.3" << std::endl;
         while(!buyOrders.empty()){
             std::shared_ptr<Order> currentEntry = buyOrders.top();
@@ -84,7 +84,7 @@ bool OrderBook::cancelOrder(std::shared_ptr<Order> order, std::mutex& mtx){
     }
     else{
         std::priority_queue<std::shared_ptr<Order>, std::vector<std::shared_ptr<Order>>, CompareSellOrder> tempQueue;
-        bool hadEntry = false;
+        std::atomic<bool> hadEntry = false;
         while(!sellOrders.empty()){
             std::shared_ptr<Order> currentEntry = sellOrders.top();
             sellOrders.pop();

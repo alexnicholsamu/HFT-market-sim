@@ -3,7 +3,7 @@
 Market::Market(): rd(), generator(rd()) {}
 
 void Market::executeOrderBook(std::mutex& mtx){
-    std::chrono::seconds sleepDuration(3);
+    std::chrono::seconds sleepDuration(6);
     std::this_thread::sleep_for(sleepDuration);
     std::cout << "exec Order Book checkpoint 1" << std::endl;
     std::vector<std::shared_ptr<Order>> orders = orderbook->executeTrades(mtx);

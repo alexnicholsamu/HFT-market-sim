@@ -6,10 +6,10 @@ Trader::Trader(int id, double available_cash, std::shared_ptr<OrderBook> orderbo
 
 void Trader::makeOrder(OrderType type, std::shared_ptr<Stock> stock, int quantity, OrderPreference pref, std::mutex& mtx){
     std::shared_ptr<Order> order = std::make_shared<Order>(type, stock, quantity, id, pref, mtx);
-    double order_price = order->order_price; 
+    std::atomic<double> order_price = order->order_price; 
     if(order->type == OrderType::Buy){
         std::cout << "Trader action checkpoint 3.1" << std::endl;
-        double moneychange = order_price * quantity;
+        std::atomic<double> moneychange = order_price * quantity;
         available_cash -= moneychange;
         active_orders.push_back(order);
         orderbook->addOrder(order, mtx);
@@ -27,7 +27,7 @@ void Trader::makeOrder(OrderType type, std::shared_ptr<Stock> stock, int quantit
 
 
 void Trader::cancelOrder(std::shared_ptr<Order> order, std::mutex& mtx){
-    bool cancel = orderbook->cancelOrder(order, mtx);
+    std::atomic<bool> cancel = orderbook->cancelOrder(order, mtx);
     if(cancel && order->type == OrderType::Buy){
         available_cash += order->order_price * order->quantity;
         std::cout << "Order Canceled!\n" << std::endl; 
@@ -44,23 +44,23 @@ void Trader::updatePortfolio(std::shared_ptr<Order> order, std::mutex& mtx){
 }
 
 void Trader::doAction(std::vector<std::shared_ptr<Stock>> stocks, std::mutex& mtx){
-    int portfolio_size = portfolio.holdings.size();
+    std::atomic<int> portfolio_size = portfolio.holdings.size();
     std::uniform_real_distribution<double> distribution(0.0, 1.0);
-    double action = distribution(generator);
+    std::atomic<double> action = distribution(generator);
     std::uniform_int_distribution<int> stockBuyDistribution(0, stocks.size()-1);
     std::shared_ptr<Stock> chosenStock;
     OrderPreference type;
     OrderType Otype;
-    int quantityBuy;
-    double typeAction = distribution(generator);
-    int quantitySell;
-    int choice;
-    int order_size = active_orders.size();
+    std::atomic<int> quantityBuy;
+    std::atomic<double> typeAction = distribution(generator);
+    std::atomic<int> quantitySell;
+    std::atomic<int> choice;
+    std::atomic<int> order_size = active_orders.size();
     std::cout << "Trader action checkpoint 1" << std::endl;
     if(action < 0.475 ){
         choice = stockBuyDistribution(generator);
         chosenStock = stocks[choice];
-        std::uniform_int_distribution<int> quantBuyDistribution(0,(int)floor(available_cash/chosenStock->getPrice(mtx)));
+        std::uniform_int_distribution<int> quantBuyDistribution(0,(int)floor(available_cash/(chosenStock->getPrice(mtx))));
         quantityBuy = quantBuyDistribution(generator);
         std::cout << "Trader action checkpoint 2.1" << std::endl;
         if(typeAction < 0.5){
