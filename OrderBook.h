@@ -5,23 +5,13 @@
 
 struct CompareSellOrder {
     bool operator()(std::shared_ptr<Order> OrderA, std::shared_ptr<Order> OrderB) {
-        if (OrderA->order_price != OrderB->order_price) {
-            return OrderA->order_price < OrderB->order_price;
-        }
-        else {
-            return OrderA->timestamp > OrderB->timestamp;
-        }
+        return OrderA->order_price <= OrderB->order_price;
     }
 };
 
 struct CompareOrder {
     bool operator()(std::shared_ptr<Order> OrderA, std::shared_ptr<Order> OrderB) {
-        if (OrderA->order_price != OrderB->order_price) {
-            return OrderA->order_price > OrderB->order_price;
-        }
-        else {
-            return OrderA->timestamp > OrderB->timestamp;
-        }
+        return OrderA->order_price >= OrderB->order_price;
     }
 };
 

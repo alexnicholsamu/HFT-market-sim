@@ -58,7 +58,6 @@ void Trader::doAction(std::vector<std::shared_ptr<Stock>> stocks, std::mutex& tr
     int quantitySell;
     int choice;
     int order_size = active_orders.size();
-    std::cout << "Trader action checkpoint 1" << std::endl;
     if(action < 0.475 ){
         choice = stockBuyDistribution(generator);
         chosenStock = stocks[choice];

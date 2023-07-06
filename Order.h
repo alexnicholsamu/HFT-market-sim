@@ -15,7 +15,6 @@ public:
     int quantity;
     OrderStatus status = OrderStatus::Open;
     int id;
-    std::chrono::system_clock::time_point timestamp;
     OrderPreference pref;
 
     Order(OrderType type, std::shared_ptr<Stock> stock, int quantity, int id, OrderPreference pref);
