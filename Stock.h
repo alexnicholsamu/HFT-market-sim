@@ -28,11 +28,11 @@ public:
     std::random_device rd;
     std::mt19937 generator;
     Stock(std::string name, double price);
-    double getPrice(std::mutex& mtx);
-    void updateFactors(double factor, std::mutex& mtx);
-    void fluctuate(std::vector<double> fluctuations, std::mutex& mtx);
-    void editPrice(double amount, bool dir, std::mutex& mtx);
-    void econIndicators(double factors, double impact, std::mutex& mtx);
+    double getPrice();
+    void updateFactors(double factor, std::mutex& factmtx);
+    void fluctuate(std::vector<double> fluctuations, std::mutex& flucmtx);
+    void editPrice(double amount, bool dir);
+    void econIndicators(double factors, double impact, std::mutex& econmtx);
 };
 
 #endif

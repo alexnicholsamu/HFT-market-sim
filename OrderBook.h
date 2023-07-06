@@ -30,9 +30,9 @@ public:
     std::priority_queue<std::shared_ptr<Order>, std::vector<std::shared_ptr<Order>>, CompareOrder> buyOrders;
     std::priority_queue<std::shared_ptr<Order>, std::vector<std::shared_ptr<Order>>, CompareSellOrder> sellOrders;
     OrderBook();
-    void addOrder(std::shared_ptr<Order> order, std::mutex& mtx);
-    std::vector<std::shared_ptr<Order>> executeTrades(std::mutex& mtx);
-    bool cancelOrder(std::shared_ptr<Order> order, std::mutex& mtx);
+    void addOrder(std::shared_ptr<Order> order, std::mutex& trademtx);
+    std::vector<std::shared_ptr<Order>> executeTrades(std::mutex& ordmtx);
+    bool cancelOrder(std::shared_ptr<Order> order, std::mutex& trademtx);
     void clear();
 };
 

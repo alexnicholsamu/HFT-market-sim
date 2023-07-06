@@ -16,10 +16,10 @@ public:
 
     Trader(int id, double available_cash, std::shared_ptr<OrderBook> orderbook);
 
-    void makeOrder(OrderType type, std::shared_ptr<Stock> stock, int quantity, OrderPreference pref, std::mutex& mtx);
-    void updatePortfolio(std::shared_ptr<Order> order, std::mutex& mtx);
-    void cancelOrder(std::shared_ptr<Order> order, std::mutex& mtx);
-    void doAction(std::vector<std::shared_ptr<Stock>> stocks, std::mutex& mtx);
+    void makeOrder(OrderType type, std::shared_ptr<Stock> stock, int quantity, OrderPreference pref, std::mutex& trademtx);
+    void updatePortfolio(std::shared_ptr<Order> order, std::mutex& ordmtx);
+    void cancelOrder(std::shared_ptr<Order> order, std::mutex& trademtx);
+    void doAction(std::vector<std::shared_ptr<Stock>> stocks, std::mutex& trademtx);
 };
 
 #endif

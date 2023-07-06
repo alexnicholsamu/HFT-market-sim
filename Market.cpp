@@ -2,41 +2,43 @@
 
 Market::Market(): rd(), generator(rd()) {}
 
-void Market::executeOrderBook(std::mutex& mtx){
+void Market::executeOrderBook(std::mutex& ordmtx){
     std::chrono::seconds sleepDuration(6);
     std::this_thread::sleep_for(sleepDuration);
     std::cout << "exec Order Book checkpoint 1" << std::endl;
-    std::vector<std::shared_ptr<Order>> orders = orderbook->executeTrades(mtx);
+    std::vector<std::shared_ptr<Order>> orders = orderbook->executeTrades(ordmtx);
     std::cout << "exec Order Book checkpoint 4" << std::endl;
     if(!orders.empty()){
         std::shared_ptr<Order> buyOrder = orders[0];
         std::shared_ptr<Order> sellOrder = orders[1];
         for(std::shared_ptr<Trader>& trader : traders){
             if(trader->id == buyOrder->id){
-                trader->updatePortfolio(buyOrder, mtx);
+                trader->updatePortfolio(buyOrder, ordmtx);
             }
             if(trader->id == sellOrder->id){
-                trader->updatePortfolio(sellOrder, mtx);
+                trader->updatePortfolio(sellOrder, ordmtx);
             }
         }
     }
 }
 
-void Market::generateMarketEvent(std::map<double, MarketEventType> MEcreation, std::mutex& mtx){
+void Market::generateMarketEvent(std::map<double, MarketEventType> MEcreation, std::mutex& meventmtx){
     std::chrono::seconds sleepDuration(10);
     std::this_thread::sleep_for(sleepDuration);
     std::uniform_real_distribution<double> distribution(0.0, 1.0);
     double marketEvent = distribution(generator);
     for(auto& pair : MEcreation){
         if (marketEvent <= pair.first) {
-            applyMarketImpact(pair.second, mtx);
+            applyMarketImpact(pair.second, meventmtx);
             break;
         }
     }
     
 }
 
-void Market::fluctuateMarket(std::mutex& mtx){
+void Market::fluctuateMarket(std::mutex& flucmtx){
+    std::chrono::seconds sleepDuration(5);
+    std::this_thread::sleep_for(sleepDuration);
     std::cout << "Market Fluctuation!" << std::endl;
     std::uniform_real_distribution<double> distribution(0.0, 1.0);
     double chooseStocks = distribution(generator);
@@ -48,13 +50,11 @@ void Market::fluctuateMarket(std::mutex& mtx){
     marketFluctuations.push_back(chooseDirection);
     marketFluctuations.push_back(chooseDegree);
     for (std::shared_ptr<Stock>& stock : stocks) { // directly apply fluctuations to stocks
-        stock->fluctuate(marketFluctuations, mtx);
+        stock->fluctuate(marketFluctuations, flucmtx);
     }
-    std::chrono::seconds sleepDuration(2);
-    std::this_thread::sleep_for(sleepDuration);
 }
 
-void Market::applyMarketImpact(MarketEventType ME, std::mutex& mtx){
+void Market::applyMarketImpact(MarketEventType ME, std::mutex& meventmtx){
     double impact;
     std::vector<double> fluctuations;
     switch(ME){
@@ -84,7 +84,7 @@ void Market::applyMarketImpact(MarketEventType ME, std::mutex& mtx){
                 factors *= ((1/log2(change))/2);
             }
             for (std::shared_ptr<Stock>& stock : stocks) { // directly apply fluctuations to stocks
-                stock->updateFactors(factors, mtx);
+                stock->updateFactors(factors, meventmtx);
             }
             break;
         }
@@ -99,7 +99,7 @@ void Market::applyMarketImpact(MarketEventType ME, std::mutex& mtx){
                 factors *= (1+impact);
             }
             for (std::shared_ptr<Stock>& stock : stocks) { // directly apply fluctuations to stocks
-                stock->updateFactors(factors, mtx);
+                stock->updateFactors(factors, meventmtx);
             }
             break;
         }
@@ -108,7 +108,7 @@ void Market::applyMarketImpact(MarketEventType ME, std::mutex& mtx){
             std::uniform_real_distribution<double> EIRdistribution(0.25, 0.50);
             impact = EIRdistribution(generator);
             for (std::shared_ptr<Stock>& stock : stocks) { // directly apply fluctuations to stocks
-                stock->econIndicators(factors, impact, mtx);
+                stock->econIndicators(factors, impact, meventmtx);
             }
             break;
         }
@@ -131,21 +131,21 @@ void Market::applyMarketImpact(MarketEventType ME, std::mutex& mtx){
                 fluctuations.push_back(highlow * 0.4);
             }
             for (std::shared_ptr<Stock>& stock : stocks) {
-                stock->fluctuate(fluctuations, mtx);
+                stock->fluctuate(fluctuations, meventmtx);
             }
             break;
         }
         case MarketEventType::Recession: {
             std::cout << "Market Event: Recession!" << std::endl;
             for (std::shared_ptr<Stock>& stock : stocks) { 
-                stock->updateFactors(factors*0.70, mtx);
+                stock->updateFactors(factors*0.70, meventmtx);
             }
             break;
         }
         case MarketEventType::Prosperity: {
             std::cout << "Market Event: Prosperity!" << std::endl;
             for (std::shared_ptr<Stock>& stock : stocks) { 
-                stock->updateFactors(factors*1.30, mtx);
+                stock->updateFactors(factors*1.30, meventmtx);
             }
             break;
         }
@@ -160,7 +160,7 @@ void Market::applyMarketImpact(MarketEventType ME, std::mutex& mtx){
                     factors *= (1-impact);
             }
             for (std::shared_ptr<Stock>& stock : stocks) { 
-                stock->updateFactors(factors, mtx);
+                stock->updateFactors(factors, meventmtx);
             }
             break;
         }
@@ -197,19 +197,19 @@ void Market::run(){
 
     std::thread METhread([this, &start, &running, marketEventChance] {
         while (running) {
-            generateMarketEvent(marketEventChance, mtx);
+            generateMarketEvent(marketEventChance, meventmtx);
         }
     });
 
     std::thread fluctuateThread([this, &start, &running] {
         while (running) {
-            fluctuateMarket(mtx);
+            fluctuateMarket(flucmtx);
         }
     });
 
     std::thread orderbookThread([this, &start, &running] {
         while (running) {
-            executeOrderBook(mtx);
+            executeOrderBook(ordmtx);
         }
     });
 
@@ -220,7 +220,7 @@ void Market::run(){
     for (std::shared_ptr<Trader>& trader : traders) {
         std::thread traderThread([this, &start, &running, &trader] {
             while (running) {
-                trader->doAction(stocks, mtx);
+                trader->doAction(stocks, trademtx);
             }
         });
         threads.push_back(std::move(traderThread));

@@ -2,8 +2,8 @@
 
 Portfolio::Portfolio()  {}
 
-double Portfolio::makeChange(std::shared_ptr<Order> order, double cash, std::mutex& mtx){
-    std::lock_guard<std::mutex> lock(mtx);
+double Portfolio::makeChange(std::shared_ptr<Order> order, double cash, std::mutex& ordmtx){
+    std::lock_guard<std::mutex> lock(ordmtx);
     std::cout << "exec Order Book checkpoint 6" << std::endl;
     if(order->type == OrderType::Buy){
         holdings[order->stock] += order->quantity;
@@ -18,12 +18,13 @@ double Portfolio::makeChange(std::shared_ptr<Order> order, double cash, std::mut
     return cash;
 }
 
-void Portfolio::cancelSell(std::shared_ptr<Order> order, std::mutex& mtx){
-    std::lock_guard<std::mutex> guard(mtx);
+void Portfolio::cancelSell(std::shared_ptr<Order> order, std::mutex& trademtx){
+    std::lock_guard<std::mutex> guard(trademtx);
     holdings[order->stock] += order->quantity;
 }
 
-std::vector<std::shared_ptr<Stock>> Portfolio::listStocks(std::mutex& mtx){
+std::vector<std::shared_ptr<Stock>> Portfolio::listStocks(std::mutex& trademtx){
+    std::lock_guard<std::mutex> guard(trademtx);
     std::vector<std::shared_ptr<Stock>> listComps;
     for(const auto& pair : holdings) {
         std::shared_ptr<Stock> stock = pair.first;  

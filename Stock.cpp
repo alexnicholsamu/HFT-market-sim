@@ -2,18 +2,17 @@
 
 Stock::Stock(std::string name, double price): name(name), price(price), rd(), generator(rd()) {}
 
-double Stock::getPrice(std::mutex& mtx){
-    std::lock_guard<std::mutex> lock(mtx);
+double Stock::getPrice(){
     return factors*price;
 }
 
-void Stock::updateFactors(double factor, std::mutex& mtx){
-    std::lock_guard<std::mutex> lock(mtx);
+void Stock::updateFactors(double factor, std::mutex& factmtx){
+    std::lock_guard<std::mutex> lock(factmtx);
     factors = factor;
 }
 
-void Stock::fluctuate(std::vector<double> fluctuations, std::mutex& mtx){
-    std::lock_guard<std::mutex> lock(mtx);
+void Stock::fluctuate(std::vector<double> fluctuations, std::mutex& flucmtx){
+    std::lock_guard<std::mutex> lock(flucmtx);
     std::uniform_real_distribution<double> distribution(0.0, 1.0);
     std::atomic<double> stockCheck = distribution(generator);
     std::atomic<double> degreeCheck = distribution(generator);
@@ -24,17 +23,16 @@ void Stock::fluctuate(std::vector<double> fluctuations, std::mutex& mtx){
             pos = false;
         }
         if(degreeCheck > fluctuations[2]){
-            editPrice((degreeCheck/12), pos, mtx);
+            editPrice((degreeCheck/12), pos);
         }
         else{
-            editPrice((degreeCheck/18), pos, mtx);
+            editPrice((degreeCheck/18), pos);
         }
     }
     std::cout << "Market Fluctuated!" << std::endl;
 }
 
-void Stock::editPrice(double amount, bool dir, std::mutex& mtx){
-    std::lock_guard<std::mutex> lock(mtx);
+void Stock::editPrice(double amount, bool dir){
     if(dir){
         price *= (1 + amount);
     }
@@ -43,12 +41,11 @@ void Stock::editPrice(double amount, bool dir, std::mutex& mtx){
     }
 }
 
-void Stock::econIndicators(double factors, double impact, std::mutex& mtx){
-    std::lock_guard<std::mutex> lock(mtx);
+void Stock::econIndicators(double factors, double impact, std::mutex& econmtx){
     std::uniform_real_distribution<double> distribution(0.0, factors*2);
     std::atomic<double> econReport = distribution(generator);
     std::atomic<double> affectStock = 0.5;
     if(econReport>affectStock){
-        updateFactors(factors*(impact+econReport), mtx);
+        updateFactors(factors*(impact+econReport), econmtx);
     }
 }

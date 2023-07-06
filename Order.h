@@ -18,7 +18,7 @@ public:
     std::chrono::system_clock::time_point timestamp;
     OrderPreference pref;
 
-    Order(OrderType type, std::shared_ptr<Stock> stock, int quantity, int id, OrderPreference pref, std::mutex& mtx);
+    Order(OrderType type, std::shared_ptr<Stock> stock, int quantity, int id, OrderPreference pref);
 };
 
 #endif 
