@@ -190,7 +190,6 @@ void Market::run(){
     initializeStocks("stocks.txt");
     std::map<double,MarketEventType> marketEventChance = generateMarketEventChances();
     std::vector<std::thread> threads;
-    std::lock_guard<std::mutex> guard(mtx);
 
     auto start = std::chrono::steady_clock::now();
 
@@ -199,30 +198,18 @@ void Market::run(){
     std::thread METhread([this, &start, &running, marketEventChance] {
         while (running) {
             generateMarketEvent(marketEventChance, mtx);
-            auto now = std::chrono::steady_clock::now();
-            if (std::chrono::duration_cast<std::chrono::seconds>(now - start).count() >= 300) {
-                running = false;
-            }
         }
     });
 
     std::thread fluctuateThread([this, &start, &running] {
         while (running) {
             fluctuateMarket(mtx);
-            auto now = std::chrono::steady_clock::now();
-            if (std::chrono::duration_cast<std::chrono::seconds>(now - start).count() >= 300) {
-                running = false;
-            }
         }
     });
 
     std::thread orderbookThread([this, &start, &running] {
         while (running) {
             executeOrderBook(mtx);
-            auto now = std::chrono::steady_clock::now();
-            if (std::chrono::duration_cast<std::chrono::seconds>(now - start).count() >= 300) {
-                running = false;
-            }
         }
     });
 
@@ -234,14 +221,13 @@ void Market::run(){
         std::thread traderThread([this, &start, &running, &trader] {
             while (running) {
                 trader->doAction(stocks, mtx);
-                auto now = std::chrono::steady_clock::now();
-                if (std::chrono::duration_cast<std::chrono::seconds>(now - start).count() >= 300) {
-                    running = false;
-                }
             }
         });
         threads.push_back(std::move(traderThread));
     }
+
+    std::this_thread::sleep_for(std::chrono::seconds(300));
+    running = false;
 
     for (std::thread& thread : threads) {
         if (thread.joinable()) {
