@@ -18,7 +18,7 @@ public:
     double interestRate = 1.0;
     double factors = 1.0;
     std::vector<std::shared_ptr<Stock>> stocks;
-    std::shared_ptr<OrderBook> orderbook;
+    std::shared_ptr<OrderBook> orderbook = std::make_shared<OrderBook>();
     Market();
     void executeOrderBook(std::mutex& ordmtx);
     void generateMarketEvent(std::map<double, MarketEventType> MEcreation, std::mutex& meventmtx);
