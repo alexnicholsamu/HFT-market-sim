@@ -14,7 +14,6 @@
 #include <chrono>
 #include <thread>
 #include <fstream>
-#include <atomic>
 #include <cmath>
 #include <set>
 #include <algorithm>
