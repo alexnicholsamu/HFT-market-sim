@@ -15,10 +15,10 @@ void Stock::updateFactors(double factor, std::mutex& mtx){
 void Stock::fluctuate(std::vector<double> fluctuations, std::mutex& mtx){
     std::lock_guard<std::mutex> lock(mtx);
     std::uniform_real_distribution<double> distribution(0.0, 1.0);
-    double stockCheck = distribution(generator);
-    double degreeCheck = distribution(generator);
+    std::atomic<double> stockCheck = distribution(generator);
+    std::atomic<double> degreeCheck = distribution(generator);
     std::cout << "fluctuation checkpoint 2" << std::endl;
-    bool pos = true;
+    std::atomic<bool> pos = true;
     if(stockCheck > (fluctuations[0]/3)){
         if(0.5 > fluctuations[1]){
             pos = false;
@@ -46,8 +46,8 @@ void Stock::editPrice(double amount, bool dir, std::mutex& mtx){
 void Stock::econIndicators(double factors, double impact, std::mutex& mtx){
     std::lock_guard<std::mutex> lock(mtx);
     std::uniform_real_distribution<double> distribution(0.0, factors*2);
-    double econReport = distribution(generator);
-    double affectStock = 0.5;
+    std::atomic<double> econReport = distribution(generator);
+    std::atomic<double> affectStock = 0.5;
     if(econReport>affectStock){
         updateFactors(factors*(impact+econReport), mtx);
     }

@@ -150,7 +150,7 @@ void Market::applyMarketImpact(MarketEventType ME, std::mutex& mtx){
             break;
         }
         case MarketEventType::OtherGovPolicy: {
-            std::cout << "Market Event: Other Government Policty!" << std::endl;
+            std::cout << "Market Event: Other Government Policy!" << std::endl;
             std::uniform_real_distribution<double> GEdistribution(0.0, 0.25);
             impact = GEdistribution(generator);
             if(factors < 1.0){

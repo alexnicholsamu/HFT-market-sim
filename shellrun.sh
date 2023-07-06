@@ -1,10 +1,13 @@
 #!/bin/bash
 
-echo "Deleting old main.exe, if it exists"
+echo "Deleting old main, if it exists"
 rm -f main.exe
 
 echo "Starting build, may take a little while"
-g++ -g -ftime-report -std=c++17 -pthread *.cpp *.h -o main.exe
+clang++ -g -std=c++17 -pthread *.cpp -o main.exe
 
 echo "File build complete, running HFT-market-sim"
-valgrind --leak-check=full ./main.exe
+./main.exe
+
+echo "Checking for memory leaks"
+leaks -atExit -- ./main.exe

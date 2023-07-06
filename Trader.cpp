@@ -92,7 +92,7 @@ void Trader::doAction(std::vector<std::shared_ptr<Stock>> stocks, std::mutex& mt
         std::uniform_int_distribution<int> orderCancelDistribution(0, active_orders.size()-1);
         choice = orderCancelDistribution(generator);
         std::cout << "Trader action checkpoint 2.3" << std::endl;
-        if(!active_orders.size() == 0){
+        if(!(active_orders.size() == 0)){
             cancelOrder(active_orders[choice], mtx);
         }
     }
