@@ -28,11 +28,11 @@ void Trader::cancelOrder(std::shared_ptr<Order> order, std::mutex& trademtx){
     std::atomic<bool> cancel = orderbook->cancelOrder(order, trademtx);
     if(cancel && order->type == OrderType::Buy){
         available_cash += order->order_price * order->quantity;
-        std::cout << "Order for Trader " << id << " Canceled!" << std::endl; 
+        std::cout << "Order for Trader " << id << " Cancelled!" << std::endl; 
     }
     if(cancel && order->type == OrderType::Sell){
         portfolio.cancelSell(order);
-        std::cout << "Order for Trader " << id << " Canceled!" << std::endl; 
+        std::cout << "Order for Trader " << id << " Cancelled!" << std::endl; 
     }
 }
 

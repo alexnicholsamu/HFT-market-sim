@@ -59,7 +59,6 @@ std::vector<std::shared_ptr<Order>> OrderBook::executeTrades(std::mutex& ordmtx)
             break;
         }
     }
-    std::cout << "OrderBook executed!" << std::endl;
     return orders;
 }
 

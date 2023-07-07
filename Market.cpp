@@ -17,6 +17,7 @@ void Market::executeOrderBook(std::mutex& ordmtx){
                 trader->updatePortfolio(sellOrder, ordmtx);
             }
         }
+        std::cout << "OrderBook executed!" << std::endl;
     }
 }
 
