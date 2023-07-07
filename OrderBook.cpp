@@ -22,7 +22,6 @@ std::vector<std::shared_ptr<Order>> OrderBook::executeTrades(std::mutex& ordmtx)
     while(!buyOrders.empty() && !sellOrders.empty()) {
         std::shared_ptr<Order> buyOrder = buyOrders.top();
         std::shared_ptr<Order> sellOrder = sellOrders.top();
-        std::cout << "exec Order Book checkpoint 2" << std::endl;
         // Check if the orders are for the same stock
         if(buyOrder->stock->name != sellOrder->stock->name) {
             break;
@@ -32,7 +31,6 @@ std::vector<std::shared_ptr<Order>> OrderBook::executeTrades(std::mutex& ordmtx)
         if(buyOrder->order_price >= sellOrder->order_price || buyOrder->pref == OrderPreference::Market 
             || sellOrder->pref == OrderPreference::Market) {
             Trade trade(buyOrder, sellOrder);
-            std::cout << "exec Order Book checkpoint 3" << std::endl;
             buyOrder->quantity -= trade.tradeQuantity;
             sellOrder->quantity -= trade.tradeQuantity;
 
@@ -68,11 +66,9 @@ bool OrderBook::cancelOrder(std::shared_ptr<Order> order, std::mutex& trademtx){
     bool hadEntry = false;
     if(order->type == OrderType::Buy){
         std::priority_queue<std::shared_ptr<Order>, std::vector<std::shared_ptr<Order>>, CompareOrder> tempQueue;
-        std::cout << "Trader action checkpoint 3.3" << std::endl;
         while(!buyOrders.empty()){
             std::shared_ptr<Order> currentEntry = buyOrders.top();
             buyOrders.pop();
-            std::cout << "Trader action checkpoint 4.3" << std::endl;
             if(currentEntry->id == order->id && currentEntry->stock == order->stock 
                 && currentEntry->quantity == order->quantity && !hadEntry){
                 currentEntry->status = OrderStatus::Cancelled;
@@ -89,7 +85,6 @@ bool OrderBook::cancelOrder(std::shared_ptr<Order> order, std::mutex& trademtx){
         while(!sellOrders.empty()){
             std::shared_ptr<Order> currentEntry = sellOrders.top();
             sellOrders.pop();
-            std::cout << "Trader action checkpoint 6.3" << std::endl;
             if(currentEntry->id == order->id && currentEntry->stock == order->stock 
                 && currentEntry->quantity == order->quantity && !hadEntry){
                 currentEntry->status = OrderStatus::Cancelled;
