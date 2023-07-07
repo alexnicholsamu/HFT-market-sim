@@ -55,7 +55,29 @@ void Trader::doAction(std::vector<std::shared_ptr<Stock>> stocks, std::mutex& tr
     int quantitySell;
     int choice;
     int order_size = active_orders.size();
-    if(action < 0.26){
+    if(action < 0.22 && portfolio_size > 0){
+        std::uniform_int_distribution<int> stockSellDistribution(0, portfolio_size-1);
+        choice = stockSellDistribution(generator);
+        chosenStock = portfolio.listStocks()[choice];
+        std::uniform_int_distribution<int> quantSellDistribution(1, portfolio.holdings[chosenStock]);
+        quantitySell = quantSellDistribution(generator);
+        if(typeAction < 0.5){
+            type = OrderPreference::Limit;
+        }
+        else{
+            type = OrderPreference::Market;
+        }
+        makeOrder(OrderType::Sell, chosenStock, quantitySell, type, trademtx);
+    }
+    else if(action < 0.44 && portfolio_size > 0){
+        std::uniform_int_distribution<int> stockSellDistribution(0, portfolio_size-1);
+        choice = stockSellDistribution(generator);
+        chosenStock = portfolio.listStocks()[choice];
+        std::uniform_int_distribution<int> quantSellDistribution(1, portfolio.holdings[chosenStock]);
+        quantitySell = quantSellDistribution(generator);
+        portfolio.soldStock(chosenStock, quantitySell, available_cash);
+    }
+    else if(action < 0.70){
         choice = stockBuyDistribution(generator);
         chosenStock = stocks[choice];
         std::uniform_int_distribution<int> quantBuyDistribution(1,(int)floor(available_cash/(chosenStock->getPrice())));
@@ -63,17 +85,7 @@ void Trader::doAction(std::vector<std::shared_ptr<Stock>> stocks, std::mutex& tr
         available_cash -= (chosenStock->getPrice() * quantityBuy);
         portfolio.boughtStock(chosenStock, quantityBuy);
     }
-    if(action < 0.48){
-        if(portfolio_size>0){
-            std::uniform_int_distribution<int> stockSellDistribution(0, portfolio_size-1);
-            choice = stockSellDistribution(generator);
-            chosenStock = portfolio.listStocks()[choice];
-            std::uniform_int_distribution<int> quantSellDistribution(1, portfolio.holdings[chosenStock]);
-            quantitySell = quantSellDistribution(generator);
-            portfolio.soldStock(chosenStock, quantitySell, available_cash);
-        }
-    }
-    else if(action < 0.74){
+    else if(action < 0.96){
         choice = stockBuyDistribution(generator);
         chosenStock = stocks[choice];
         std::uniform_int_distribution<int> quantBuyDistribution(1,(int)floor(available_cash/(chosenStock->getPrice())));
@@ -85,22 +97,6 @@ void Trader::doAction(std::vector<std::shared_ptr<Stock>> stocks, std::mutex& tr
             type = OrderPreference::Market;
         }
         makeOrder(OrderType::Buy, chosenStock, quantityBuy, type, trademtx);
-    }
-    else if(action < 0.96){
-        if(portfolio_size>0){
-            std::uniform_int_distribution<int> stockSellDistribution(0, portfolio_size-1);
-            choice = stockSellDistribution(generator);
-            chosenStock = portfolio.listStocks()[choice];
-            std::uniform_int_distribution<int> quantSellDistribution(1, portfolio.holdings[chosenStock]);
-            quantitySell = quantSellDistribution(generator);
-            if(typeAction < 0.5){
-                type = OrderPreference::Limit;
-            }
-            else{
-                type = OrderPreference::Market;
-            }
-            makeOrder(OrderType::Sell, chosenStock, quantitySell, type, trademtx);
-        }
     }
     else{
         std::uniform_int_distribution<int> orderCancelDistribution(0, active_orders.size()-1);
