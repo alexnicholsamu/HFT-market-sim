@@ -7,14 +7,14 @@ void Market::executeOrderBook(std::mutex& ordmtx){
     std::this_thread::sleep_for(sleepDuration);
     std::vector<std::shared_ptr<Order>> orders = orderbook->executeTrades(ordmtx);
     if(!orders.empty()){
-        std::shared_ptr<Order> buyOrder = orders[0];
-        std::shared_ptr<Order> sellOrder = orders[1];
-        for(std::shared_ptr<Trader>& trader : traders){
-            if(trader->id == buyOrder->id){
-                trader->updatePortfolio(buyOrder, ordmtx);
-            }
-            if(trader->id == sellOrder->id){
-                trader->updatePortfolio(sellOrder, ordmtx);
+        for(std::shared_ptr<Order> order : orders){
+            for(std::shared_ptr<Trader>& trader : traders){
+                if(trader->id == order->id){
+                    trader->updatePortfolio(order, ordmtx);
+                }
+                if(trader->id == order->id){
+                    trader->updatePortfolio(order, ordmtx);
+                }
             }
         }
         std::cout << "OrderBook executed!" << std::endl;
