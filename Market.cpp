@@ -31,7 +31,6 @@ void Market::generateMarketEvent(std::map<double, MarketEventType> MEcreation, s
             break;
         }
     }
-    std::cout << "Market Fluctuated!" << std::endl;
 }
 
 void Market::fluctuateMarket(std::mutex& flucmtx){
@@ -48,6 +47,7 @@ void Market::fluctuateMarket(std::mutex& flucmtx){
     for (std::shared_ptr<Stock>& stock : stocks) { // directly apply fluctuations to stocks
         stock->fluctuate(marketFluctuations, flucmtx);
     }
+    std::cout << "Market Fluctuated!" << std::endl;
 }
 
 void Market::applyMarketImpact(MarketEventType ME, std::mutex& meventmtx){

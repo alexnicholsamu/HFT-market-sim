@@ -8,12 +8,14 @@ void OrderBook::addOrder(std::shared_ptr<Order> order, std::mutex& trademtx) {
     switch (order->type){
         case OrderType::Buy:
             buyOrders.push(order);
+            std::cout << "Buy Order for Trader " << order->id << " Placed!" << std::endl;
             break;
         case OrderType::Sell:
             sellOrders.push(order);
+            std::cout << "Sell Order for Trader " << order->id << " Placed!" << std::endl;
             break;
     }
-    std::cout << "Order Placed!" << std::endl;
+    
 }
 
 std::vector<std::shared_ptr<Order>> OrderBook::executeTrades(std::mutex& ordmtx) {

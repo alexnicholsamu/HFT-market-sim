@@ -2,9 +2,7 @@
 
 Portfolio::Portfolio()  {}
 
-double Portfolio::makeChange(std::shared_ptr<Order> order, double cash, std::mutex& ordmtx){
-    std::lock_guard<std::mutex> lock(ordmtx);
-    std::cout << "exec Order Book checkpoint 6" << std::endl;
+double Portfolio::makeChange(std::shared_ptr<Order> order, double cash){
     if(order->type == OrderType::Buy){
         holdings[order->stock] += order->quantity;
     }
@@ -18,13 +16,11 @@ double Portfolio::makeChange(std::shared_ptr<Order> order, double cash, std::mut
     return cash;
 }
 
-void Portfolio::cancelSell(std::shared_ptr<Order> order, std::mutex& trademtx){
-    std::lock_guard<std::mutex> guard(trademtx);
+void Portfolio::cancelSell(std::shared_ptr<Order> order){
     holdings[order->stock] += order->quantity;
 }
 
-std::vector<std::shared_ptr<Stock>> Portfolio::listStocks(std::mutex& trademtx){
-    std::lock_guard<std::mutex> guard(trademtx);
+std::vector<std::shared_ptr<Stock>> Portfolio::listStocks(){
     std::vector<std::shared_ptr<Stock>> listComps;
     for(const auto& pair : holdings) {
         std::shared_ptr<Stock> stock = pair.first;  
@@ -33,3 +29,17 @@ std::vector<std::shared_ptr<Stock>> Portfolio::listStocks(std::mutex& trademtx){
     return listComps;
 }
 
+void Portfolio::boughtStock(std::shared_ptr<Stock> stock, int quantity){
+    holdings[stock] += quantity;
+    std::cout << "Stock Bought!" << std::endl;
+}
+
+double Portfolio::soldStock(std::shared_ptr<Stock> stock, int quantity, double cash){
+    holdings[stock] -= quantity;
+    cash += stock->getPrice();
+    if(holdings[stock] == 0){
+        holdings.erase(stock);
+    }
+    std::cout << "Stock Sold!" << std::endl;
+    return cash;
+}
