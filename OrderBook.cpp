@@ -3,6 +3,9 @@
 OrderBook::OrderBook() {}
 
 void OrderBook::addOrder(std::shared_ptr<Order> order, std::mutex& trademtx) {
+    /*
+        Adding a placed order to the OrderBook
+    */
     std::lock_guard<std::mutex> guard(trademtx);
     if(order->type == OrderType::Buy) {
         buyOrders[order->stock->name].push(order);
@@ -15,6 +18,11 @@ void OrderBook::addOrder(std::shared_ptr<Order> order, std::mutex& trademtx) {
 }
 
 std::vector<std::shared_ptr<Order>> OrderBook::executeTrades(std::mutex& ordmtx) {
+    /*
+        Where the orders are actually executed. The code loops through the buy orders and finds a matching (if available) sell
+        order, and depending on whether the price / orderpreference, executes the trade / sell. All orders are added to a fector 
+        and returned to be applied to the individual trader's portfolios
+    */
     std::lock_guard<std::mutex> guard(ordmtx);
     std::vector<std::shared_ptr<Order>> orders;
 
@@ -54,6 +62,14 @@ std::vector<std::shared_ptr<Order>> OrderBook::executeTrades(std::mutex& ordmtx)
 }
 
 bool OrderBook::cancelOrder(std::shared_ptr<Order> order, std::mutex& trademtx){
+    /*
+        A cancel order is found, and while it is normally expected to be an active order, there is a chance that the order is executed
+        simultaneously as the order is searched for and cancelled, so there is safeguards in place. The status of the cancellation is 
+        returned.
+
+        There is room for improvement in the effiency of this part of code, but that is a non-trivial change and should be approached
+        carefully (and may require a complete restructuring)
+    */
     std::lock_guard<std::mutex> guard(trademtx);
     bool hadEntry = false;
     if(order->type == OrderType::Buy){

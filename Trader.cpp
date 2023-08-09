@@ -5,6 +5,10 @@ Trader::Trader(int id, double available_cash, std::shared_ptr<OrderBook> orderbo
 
 
 void Trader::makeOrder(OrderType type, std::shared_ptr<Stock> stock, int quantity, OrderPreference pref, std::mutex& trademtx){
+    /*
+        Randomly generates order to be put in Orderbook. Care is taken to pre-process portfolio for the order (i.e. not double selling
+        a stock)
+    */
     std::shared_ptr<Order> order = std::make_shared<Order>(type, stock, quantity, id, pref);
     std::atomic<double> order_price = order->order_price; 
     if(order->type == OrderType::Buy){
@@ -25,6 +29,9 @@ void Trader::makeOrder(OrderType type, std::shared_ptr<Stock> stock, int quantit
 
 
 void Trader::cancelOrder(std::shared_ptr<Order> order, std::mutex& trademtx){
+    /*
+        Cancelling order, and applying impact of order. 
+    */
     std::atomic<bool> cancel = orderbook->cancelOrder(order, trademtx);
     if(cancel && order->type == OrderType::Buy){
         available_cash += order->order_price * order->quantity;
@@ -37,10 +44,19 @@ void Trader::cancelOrder(std::shared_ptr<Order> order, std::mutex& trademtx){
 }
 
 void Trader::updatePortfolio(std::shared_ptr<Order> order, std::mutex& ordmtx){
+    /*
+        Helper function
+    */
     available_cash = portfolio.makeChange(order, available_cash);
 }
 
 void Trader::doAction(std::vector<std::shared_ptr<Stock>> stocks, std::mutex& trademtx){
+    /*
+        Heart of the Trader threads. This randomly generates actions to do, from a Market/Raw buy, Market/Raw sell, and cancellation.
+        Orders could be created and sent, and the portfolio has a lot of pre-processing to account for safety of synchonization and
+        delayed Orderbook Execution. There is room for customization witihn the percentages/probability distribution, but a Raw buy
+        is a necessary aspect of the trader options (unless, of course, they are initialzied with a portfolio already)
+    */
     std::chrono::seconds sleepDuration(3);
     std::this_thread::sleep_for(sleepDuration);
     int portfolio_size = portfolio.holdings.size();

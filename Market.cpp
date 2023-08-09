@@ -3,6 +3,10 @@
 Market::Market(): rd(), generator(rd()) {}
 
 void Market::executeOrderBook(std::mutex& ordmtx){
+    /*
+        Where the orderbook is executed, and applied. If one is interested in customizing this code (proceed with caution), they should 
+        look at the Orderbook Class or the Trader Class instead.
+    */
     std::chrono::seconds sleepDuration(6);
     std::this_thread::sleep_for(sleepDuration);
     std::vector<std::shared_ptr<Order>> orders = orderbook->executeTrades(ordmtx);
@@ -22,6 +26,9 @@ void Market::executeOrderBook(std::mutex& ordmtx){
 }
 
 void Market::generateMarketEvent(std::map<double, MarketEventType> MEcreation, std::mutex& meventmtx){
+    /*
+        Where market events are randomly generated, and applied to the table. 
+    */
     std::chrono::seconds sleepDuration(8);
     std::this_thread::sleep_for(sleepDuration);
     std::uniform_real_distribution<double> distribution(0.0, 1.0);
@@ -35,6 +42,11 @@ void Market::generateMarketEvent(std::map<double, MarketEventType> MEcreation, s
 }
 
 void Market::fluctuateMarket(std::mutex& flucmtx){
+    /*
+        Where prices are continually altered to reflect random (though obivously not random, it is an appropiate astraction for the sake
+        of this project) movements of the market. If one is interested in changes the scale of the impact / the threshold, they should
+        look in the stock class
+    */
     std::chrono::seconds sleepDuration(2);
     std::this_thread::sleep_for(sleepDuration);
     std::uniform_real_distribution<double> distribution(0.0, 1.0);
@@ -52,6 +64,10 @@ void Market::fluctuateMarket(std::mutex& flucmtx){
 }
 
 void Market::applyMarketImpact(MarketEventType ME, std::mutex& meventmtx){
+    /*
+        Where market impacts are applied. The numbers in here were included based on mathematical probabilities / real world numbers, 
+        so while they can be messed with proceed with caution as varying a few numbers can drastically change the scale of their impact.
+    */
     double impact;
     std::vector<double> fluctuations;
     switch(ME){
@@ -168,6 +184,11 @@ void Market::applyMarketImpact(MarketEventType ME, std::mutex& meventmtx){
 }
 
 std::map<double,MarketEventType> Market::generateMarketEventChances(){
+    /*
+        A customizable table of probability thresholds for Market Events. While there is certainly room to add marketevents, that would
+        require a non-trivial modification of the code, so proceed with caution. Otherwise, the table thresholds can be edited to reflect
+        a different average quantity of different events
+    */
     std::map<double,MarketEventType> marketEventChance;
     marketEventChance[0.05] = MarketEventType::Prosperity;
     marketEventChance[0.10] = MarketEventType::Recession;
@@ -181,6 +202,13 @@ std::map<double,MarketEventType> Market::generateMarketEventChances(){
 }
 
 void Market::run(){
+    /*
+        Heart of the simulation. This creates my Traders/stocks, as well as generating my market event chance table.
+        Then, it starts the threads, having one for each of the 25 (the amount I have) Traders, one that generates Market Events, 
+        one that fluctuates stock prices randomly, and one that executes the orderbook. There is also the main thread that runs the 
+        simulation for 5 minutes (300 seconds) - a customizable quantity - before joining the threads and wiping the vectors and 
+        such clean.
+    */
     std::cout << "Setting up simulation!"<< std::endl;
     std::atomic<bool> running(true);
     initializeTraders("traders.txt");
@@ -239,12 +267,20 @@ void Market::run(){
 
 
 void Market::reset(){
+    /*
+        Cleanup. Most pointers should destruct automatically as they are shared/unique.
+    */
     traders.clear();
     stocks.clear();
     orderbook->clear();
 }
 
 void Market::initializeTraders(std::string filename) {
+    /*
+        This code initializes my traders via my manually created traders.txt file. This file can be edited to use different traders with
+        different initial money, though if the amount is too low their buying ability will be limited. Also, too many traders and there
+        will be more significant overhead, as in most (laptop) systems only ~10 threads at a time are supported (I currently run 29)
+    */
     std::ifstream file(filename);
     int id;
     double cash;
@@ -256,6 +292,11 @@ void Market::initializeTraders(std::string filename) {
 }
 
 void Market::initializeStocks(std::string filename) {
+    /*
+        This code initializes my stocks via my manually created stocks.txt file. This file can be edited to use 
+        different stocks/different prices. It supports fake stocks/prices, just be wary of Trader money as if their
+        price is too high, traders will not be able to buy them (unless they sell their way up to being able to buy)
+    */
     std::ifstream file(filename);
     std::string name;
     double price;
