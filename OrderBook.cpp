@@ -20,7 +20,7 @@ void OrderBook::addOrder(std::shared_ptr<Order> order, std::mutex& trademtx) {
 std::vector<std::shared_ptr<Order>> OrderBook::executeTrades(std::mutex& ordmtx) {
     /*
         Where the orders are actually executed. The code loops through the buy orders and finds a matching (if available) sell
-        order, and depending on whether the price / orderpreference, executes the trade / sell. All orders are added to a fector 
+        order, and depending on whether the price / orderpreference, executes the trade / sell. All orders are added to a vector 
         and returned to be applied to the individual trader's portfolios
     */
     std::lock_guard<std::mutex> guard(ordmtx);

@@ -11,7 +11,7 @@ void Market::executeOrderBook(std::mutex& ordmtx){
     std::this_thread::sleep_for(sleepDuration);
     std::vector<std::shared_ptr<Order>> orders = orderbook->executeTrades(ordmtx);
     if(!orders.empty()){
-        for(std::shared_ptr<Order> order : orders){
+        for(std::shared_ptr<Order> order : orders){ // I feel like there is room for efficiency improvements here
             for(std::shared_ptr<Trader>& trader : traders){
                 if(trader->id == order->id){
                     trader->updatePortfolio(order, ordmtx);
