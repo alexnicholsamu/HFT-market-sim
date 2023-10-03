@@ -8,6 +8,3 @@ clang++ -g -std=c++17 -pthread *.cpp -o main.exe
 
 echo "File build complete, running HFT-market-sim"
 ./main.exe
-
-echo "Checking for memory leaks"
-leaks -atExit -- ./main.exe
