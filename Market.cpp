@@ -29,7 +29,7 @@ void Market::generateMarketEvent(std::map<double, MarketEventType> MEcreation, s
     /*
         Where market events are randomly generated, and applied to the table. 
     */
-    std::chrono::seconds sleepDuration(8);
+    std::chrono::seconds sleepDuration(1);
     std::this_thread::sleep_for(sleepDuration);
     std::uniform_real_distribution<double> distribution(0.0, 1.0);
     double marketEvent = distribution(generator);
@@ -47,7 +47,7 @@ void Market::fluctuateMarket(std::mutex& flucmtx){
         of this project) movements of the market. If one is interested in changes the scale of the impact / the threshold, they should
         look in the stock class
     */
-    std::chrono::seconds sleepDuration(2);
+    std::chrono::seconds sleepDuration(1);
     std::this_thread::sleep_for(sleepDuration);
     std::uniform_real_distribution<double> distribution(0.0, 1.0);
     double chooseStocks = distribution(generator);
@@ -183,24 +183,6 @@ void Market::applyMarketImpact(MarketEventType ME, std::mutex& meventmtx){
     }
 }
 
-std::map<double,MarketEventType> Market::generateMarketEventChances(){
-    /*
-        A customizable table of probability thresholds for Market Events. While there is certainly room to add marketevents, that would
-        require a non-trivial modification of the code, so proceed with caution. Otherwise, the table thresholds can be edited to reflect
-        a different average quantity of different events
-    */
-    std::map<double,MarketEventType> marketEventChance;
-    marketEventChance[0.05] = MarketEventType::Prosperity;
-    marketEventChance[0.10] = MarketEventType::Recession;
-    marketEventChance[0.20] = MarketEventType::EconomicIndicatorReports;
-    marketEventChance[0.30] = MarketEventType::GlobalEconomy;
-    marketEventChance[0.40] = MarketEventType::InterestRateChange;
-    marketEventChance[0.50] = MarketEventType::OtherGovPolicy;
-    marketEventChance[0.60] = MarketEventType::PublicOpinion;
-    marketEventChance[1.0] = MarketEventType::Nothing;
-    return marketEventChance;
-}
-
 void Market::run(){
     /*
         Heart of the simulation. This creates my Traders/stocks, as well as generating my market event chance table.
@@ -213,7 +195,15 @@ void Market::run(){
     std::atomic<bool> running(true);
     initializeTraders("traders.txt");
     initializeStocks("stocks.txt");
-    std::map<double,MarketEventType> marketEventChance = generateMarketEventChances();
+    std::map<double,MarketEventType> marketEventChance;
+    marketEventChance[0.05] = MarketEventType::Prosperity;
+    marketEventChance[0.10] = MarketEventType::Recession;
+    marketEventChance[0.20] = MarketEventType::EconomicIndicatorReports;
+    marketEventChance[0.30] = MarketEventType::GlobalEconomy;
+    marketEventChance[0.40] = MarketEventType::InterestRateChange;
+    marketEventChance[0.50] = MarketEventType::OtherGovPolicy;
+    marketEventChance[0.60] = MarketEventType::PublicOpinion;
+    marketEventChance[1.0] = MarketEventType::Nothing;
     std::vector<std::thread> threads;
 
     auto start = std::chrono::steady_clock::now();

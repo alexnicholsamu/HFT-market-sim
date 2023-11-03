@@ -25,7 +25,6 @@ public:
     void applyMarketImpact(MarketEventType ME, std::mutex& meventmtx);
     void initializeStocks(std::string filename);
     void initializeTraders(std::string filename);
-    std::map<double,MarketEventType> generateMarketEventChances();
     void reset();
     void fluctuateMarket(std::mutex& flucmtx);
     void run();

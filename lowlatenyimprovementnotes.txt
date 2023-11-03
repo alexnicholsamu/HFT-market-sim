@@ -1,0 +1,5 @@
+replace mutexs with atomics if possible
+
+dont write out std::cout
+
+compile with -03 (enables optimizations on clang)
